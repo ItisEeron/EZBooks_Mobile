@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_name_label"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/userProfile"
+        android:layout_width="366dp"
+        android:layout_height="113dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginLeft="9dp"
+        android:layout_marginTop="64dp"
+        android:background="@color/colorPrimaryDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/card_user_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:contentDescription="TODO"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.008"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/card_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="17dp"
+            android:layout_marginStart="71dp"
+            android:layout_marginLeft="71dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginEnd="59dp"
+            android:layout_marginRight="59dp"
+            android:layout_marginBottom="15dp"
+            android:text="Jack Frost"
+            app:layout_constraintBottom_toTopOf="@+id/card_user_phone_number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView_UserProfileTag"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/card_user_phone_number"
+            android:layout_width="89dp"
+            android:layout_height="19dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="35dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginBottom="8dp"
+            android:text="925-555-5555"
+            app:layout_constraintBottom_toTopOf="@+id/card_user_status"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/phone_number_card_lable"
+            app:layout_constraintTop_toBottomOf="@+id/card_user_name" />
+
+        <TextView
+            android:id="@+id/card_user_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="67dp"
+            android:layout_marginLeft="67dp"
+            android:layout_marginEnd="91dp"
+            android:layout_marginRight="91dp"
+            android:layout_marginBottom="18dp"
+            android:text="Good"
+            android:textColor="@android:color/holo_green_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/status_card_label"
+            app:layout_constraintTop_toBottomOf="@+id/card_user_phone_number" />
+
+        <TextView
+            android:id="@+id/textView_UserProfileTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="13dp"
+            android:text="Name:"
+            app:layout_constraintBottom_toTopOf="@+id/phone_number_card_lable"
+            app:layout_constraintEnd_toStartOf="@+id/card_user_name"
+            app:layout_constraintStart_toEndOf="@+id/card_user_image"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/phone_number_card_lable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="11dp"
+            android:text="Phone Number:"
+            app:layout_constraintBottom_toTopOf="@+id/status_card_label"
+            app:layout_constraintEnd_toStartOf="@+id/card_user_phone_number"
+            app:layout_constraintStart_toEndOf="@+id/card_user_image"
+            app:layout_constraintTop_toBottomOf="@+id/textView_UserProfileTag" />
+
+        <TextView
+            android:id="@+id/status_card_label"
+            android:layout_width="wrap_content"
+            android:layout_height="14dp"
+            android:layout_marginBottom="23dp"
+            android:text="Status:"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/card_user_status"
+            app:layout_constraintStart_toEndOf="@+id/card_user_image"
+            app:layout_constraintTop_toBottomOf="@+id/phone_number_card_lable" />
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.v7.widget.CardView>
