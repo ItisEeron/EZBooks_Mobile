@@ -1,6 +1,7 @@
 package com.example.mac.ezbooks
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -11,9 +12,12 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.DrawerLayout.DrawerListener
 import android.support.v7.app.ActionBar
 import android.support.v7.widget.Toolbar
+import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
 import com.example.mac.ezbooks.ui.main.*
+import kotlinx.android.synthetic.main.activity_main.*
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
 
         //Now time to initialize the navigation click events, will not present anything!!!!
-        val navigationView : NavigationView = findViewById(R.id.nav_view)
+        val navigationView : NavigationView = nav_view
         //Sets up the navigation menu from main Drawer
         navigationView.setNavigationItemSelectedListener { menuItem ->
             menuItem.isChecked = true
@@ -82,8 +86,14 @@ class MainActivity : AppCompatActivity() {
             navigationView.setCheckedItem(menuItem)
             onNavigationItemSelected(menuItem)
         }
-    }//onCreate
 
+        search_Textbook_fab.setOnClickListener {
+            var menuItem = navigationView.menu.getItem(0).subMenu.getItem(4)
+            navigationView.setCheckedItem(menuItem)
+            onNavigationItemSelected(menuItem)
+        }
+
+    }//onCreate
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
@@ -100,7 +110,6 @@ class MainActivity : AppCompatActivity() {
     fun displayScreen(id: Int) {
         //TODO: ADD MORE TO THE displayScreen function
 
-
         //This pops all fragments for a clean navigation from the home!!!
         var fragEntryCount = supportFragmentManager.backStackEntryCount
         while(fragEntryCount > 1) {
@@ -112,23 +121,38 @@ class MainActivity : AppCompatActivity() {
         val fragment = when (id) {
 
             R.id.nav_edit_credentials->{
-                supportFragmentManager.beginTransaction().replace(R.id.flContent,
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                                R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
                         EditAccountFragment()).addToBackStack("editAccout").commit()
             }
             R.id.nav_add_listing->{
-                supportFragmentManager.beginTransaction().replace(R.id.flContent,
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                        R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
                         UploadBookFragment()).addToBackStack("uploadBook").commit()
             }
             R.id.nav_requested_books->{
-                supportFragmentManager.beginTransaction().replace(R.id.flContent,
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                                R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
                         RequestedBooksFragment()).addToBackStack("requestedBooks").commit()
             }
             R.id.nav_books_you_sell->{
-                supportFragmentManager.beginTransaction().replace(R.id.flContent,
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                                R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
                         BooksForSaleFragment()).addToBackStack("booksforSale").commit()
             }
             R.id.nav_search_shop->{
-                supportFragmentManager.beginTransaction().replace(R.id.flContent,
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                                R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
                         SearchFragment()).addToBackStack("searchShop").commit()
             }
             R.id.nav_change_password->{

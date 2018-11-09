@@ -3,6 +3,8 @@ package com.example.mac.ezbooks
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
@@ -15,6 +17,7 @@ import com.example.mac.ezbooks.ui.main.*
 import kotlinx.android.synthetic.main.edit_user_account_layout.view.*
 import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.home_fragment.view.*
+import java.io.ByteArrayOutputStream
 
 
 class HomeFragment : Fragment() {
@@ -62,6 +65,15 @@ class HomeFragment : Fragment() {
         view.home_card1.card_user_name.text = booksViewModel.user_account.user_name
         view.home_card1.card_user_phone_number.text = booksViewModel.user_account.phone_number
 
+        if(booksViewModel.user_account.profile_img != null){
+            var bitmap = BitmapFactory.
+                    decodeByteArray(booksViewModel.user_account.profile_img,
+                            0, booksViewModel!!.user_account!!.profile_img!!.size)
+            //var blob = ByteArrayOutputStream();
+            //var bitmap.compress(Bitmap.CompressFormat.PNG, 0 /* Ignored for PNGs */, blob);
+            //var bitmapdata = blob.toByteArray();
+            view.home_card1.card_user_image.setImageBitmap(bitmap)
+        }
         //This Shows the Current Accounts Status and Changes the values as neccessarry
         when(booksViewModel.user_account.account_status){
             1 ->{
@@ -87,9 +99,11 @@ class HomeFragment : Fragment() {
             activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_edit_credentials)
             //
 
-            fragmentManager?.beginTransaction()?.replace(R.id.flContent,
+            fragmentManager?.beginTransaction()?.
+                    setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
                     EditAccountFragment())?.addToBackStack(null)?.commit()
         }
+
         return view
     }
 
