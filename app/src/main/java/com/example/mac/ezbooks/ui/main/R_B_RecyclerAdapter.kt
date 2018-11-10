@@ -1,32 +1,28 @@
 package com.example.mac.ezbooks.ui.main
 
+import android.app.Activity
+import android.content.ClipData
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
 
-class R_B_RecyclerAdapter : RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>() {
 
-    //TODO: MAKE THE MEMBERS TAKE VALUES FROM THE VIEWMODEL
-    private val titles = arrayOf("Book One",
-            "Book Two", "Book Three", "Book Four",
-            "Book Five", "Book Six", "Book Seven",
-            "Book Eight")
+//Passes in Fragment in order to determine which List to use
+//If the Fragment is the HomeFragment, we only want the views to populate the with at most
+//5 Books
+//Other instances (Requested Books, Search, and Uploaded) will show maximum
+//Search will have filtering options and will actually only display the first 40 books
+class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : MainViewModel): RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>() {
 
-    private val details = arrayOf("Item one details", "Item two details",
-            "Item three details", "Item four details",
-            "Item file details", "Item six details",
-            "Item seven details", "Item eight details")
-
-    private val images = intArrayOf(R.drawable.android_image_1,
-            R.drawable.android_image_2, R.drawable.android_image_3,
-            R.drawable.android_image_4, R.drawable.android_image_5,
-            R.drawable.android_image_6, R.drawable.android_image_7,
-            R.drawable.android_image_8)
 
     inner class ViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView){
         var itemImage: ImageView
@@ -55,13 +51,38 @@ class R_B_RecyclerAdapter : RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, i: Int) {
-        viewHolder.itemTitle.text = titles[i]
-        viewHolder.itemDetail.text = details[i]
-        viewHolder.itemImage.setImageResource(images[i])
+        //TODO: ADD CONDITIONS FOR SELLING TEXTBOOKS AS WELL
+        if(fragment is HomeFragment) {
+            viewHolder.itemTitle.text = viewModel.recent_requested_Textbooks[i].Title
+            viewHolder.itemDetail.text = viewModel.recent_requested_Textbooks[i].isbn
+            if(viewModel.recent_requested_Textbooks[i].book_img != null){
+                var bitmap = BitmapFactory.
+                        decodeByteArray(viewModel.recent_requested_Textbooks[i].book_img,
+                                0, viewModel.recent_requested_Textbooks[i].book_img!!.size)
+                viewHolder.itemImage.setImageBitmap(bitmap)
+
+            }else{
+                viewHolder.itemImage.setImageResource(R.drawable.android_image_5)
+            }
+        }
+        else{
+            viewHolder.itemTitle.text = viewModel.requested_textbooks[i].Title
+            viewHolder.itemDetail.text = viewModel.requested_textbooks[i].isbn
+            if(viewModel.requested_textbooks[i].book_img != null){
+                var bitmap = BitmapFactory.
+                        decodeByteArray(viewModel.requested_textbooks[i].book_img,
+                                0, viewModel.requested_textbooks[i].book_img!!.size)
+                viewHolder.itemImage.setImageBitmap(bitmap)
+
+            }else{
+                viewHolder.itemImage.setImageResource(R.drawable.android_image_5)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
-        return titles.size
+        return if(fragment is HomeFragment) viewModel.recent_requested_Textbooks.size else viewModel.requested_textbooks.size
     }
+
 
 }

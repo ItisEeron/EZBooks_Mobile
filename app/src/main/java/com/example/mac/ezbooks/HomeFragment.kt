@@ -17,6 +17,7 @@ import com.example.mac.ezbooks.ui.main.*
 import kotlinx.android.synthetic.main.edit_user_account_layout.view.*
 import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.home_fragment.view.*
+//import kotlinx.android.synthetic.main.item_row.view.*
 import java.io.ByteArrayOutputStream
 
 
@@ -69,9 +70,8 @@ class HomeFragment : Fragment() {
             var bitmap = BitmapFactory.
                     decodeByteArray(booksViewModel.user_account.profile_img,
                             0, booksViewModel!!.user_account!!.profile_img!!.size)
-            //var blob = ByteArrayOutputStream();
-            //var bitmap.compress(Bitmap.CompressFormat.PNG, 0 /* Ignored for PNGs */, blob);
-            //var bitmapdata = blob.toByteArray();
+
+            //TODO: SCALE IMAGES TO SIZE OF CardImageView also allow user to center on image selected
             view.home_card1.card_user_image.setImageBitmap(bitmap)
         }
         //This Shows the Current Accounts Status and Changes the values as neccessarry
@@ -104,6 +104,7 @@ class HomeFragment : Fragment() {
                     EditAccountFragment())?.addToBackStack(null)?.commit()
         }
 
+
         return view
     }
 
@@ -113,7 +114,7 @@ class HomeFragment : Fragment() {
 
         //This sets up the first set of cards underneath the Requested Books
         requestedBooksRecyclerview = home_requested_books_recyclerview1
-        requestedbooksadapter = R_B_RecyclerAdapter()
+        requestedbooksadapter = R_B_RecyclerAdapter(this, booksViewModel)
         requestedBooksRecyclerview.adapter = requestedbooksadapter
         //How to make the Recyclerview horizontal!!!!
         requestedbookslayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -122,7 +123,7 @@ class HomeFragment : Fragment() {
 
         //The second set of cards is set up beneath the first set
         uploadedBooksRecyclerview = home_uploaded_books_recyclerview1
-        uploadedBooksadapter = R_B_RecyclerAdapter()
+        uploadedBooksadapter = R_B_RecyclerAdapter(this, booksViewModel)
         uploadedBooksRecyclerview.adapter = uploadedBooksadapter
         uploadedBookslayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         uploadedBooksRecyclerview.layoutManager = uploadedBookslayoutManager

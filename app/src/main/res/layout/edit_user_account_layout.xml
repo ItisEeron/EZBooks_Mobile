@@ -17,9 +17,22 @@
     <android.support.v7.widget.CardView
         android:id="@+id/upload_image_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="163dp">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/upload_image_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="19dp"
+            android:layout_marginLeft="19dp"
+            android:layout_marginTop="11dp"
+            android:text="@string/upload_an_image"
+            android:textAppearance="@android:style/TextAppearance.Large" />
+
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/upload_image_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,39 +40,35 @@
 
             <ImageView
                 android:id="@+id/current_user_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="45dp"
-                android:layout_marginLeft="45dp"
-                android:layout_marginTop="52dp"
-                app:srcCompat="@drawable/ic_launcher_background"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginStart="55dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="27dp"
+                android:layout_marginBottom="23dp"
+                android:background="@drawable/ic_launcher_background"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/upload_image_button"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@mipmap/ic_launcher"
                 tools:ignore="VectorDrawableCompat" />
-
-            <TextView
-                android:id="@+id/upload_image_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="19dp"
-                android:layout_marginLeft="19dp"
-                android:layout_marginTop="11dp"
-                android:text="@string/upload_an_image"
-                android:textAppearance="@android:style/TextAppearance.Large" />
 
             <Button
                 android:id="@+id/upload_image_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/current_user_image"
-                android:layout_marginEnd="-349dp"
-                android:layout_marginBottom="60dp"
+                android:layout_marginStart="27dp"
+                android:layout_marginEnd="49dp"
+                android:layout_marginBottom="48dp"
                 android:layout_toStartOf="@+id/upload_image_label"
-                android:text="@string/upload_from_device"/>
+                android:text="@string/upload_from_device"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/current_user_image"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/reset_image_button"
@@ -67,11 +76,17 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/upload_image_button"
                 android:layout_alignStart="@+id/upload_image_button"
-                android:layout_marginTop="-59dp"
-                android:text="@string/reset_image"/>
+                android:layout_marginStart="110dp"
+                android:layout_marginEnd="97dp"
+                android:layout_marginBottom="31dp"
+                android:text="Upload From Camera"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/current_user_image"
+                app:layout_constraintTop_toBottomOf="@+id/upload_image_button" />
 
 
-        </RelativeLayout>
+        </android.support.constraint.ConstraintLayout>
 
 
     </android.support.v7.widget.CardView>

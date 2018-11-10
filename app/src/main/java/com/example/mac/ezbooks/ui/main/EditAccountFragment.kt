@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Environment
 import android.support.v4.content.FileProvider
 import android.util.Log
+import kotlinx.android.synthetic.main.home_fragment.view.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileNotFoundException
@@ -38,6 +39,7 @@ class EditAccountFragment : Fragment(){
     private lateinit var ezbooksViewModel: MainViewModel
     private lateinit var main_account : UserAccount
     private lateinit var mCurrentPhotoPath: String
+    private var pendingUpload: ByteArray? = null
     val GET_FROM_GALLERY = 3
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 1
@@ -58,6 +60,14 @@ class EditAccountFragment : Fragment(){
 
         main_account = ezbooksViewModel.user_account
 
+        //Present User Account image as the uploaded image for this page
+        if(main_account.profile_img != null){
+            var bitmap = BitmapFactory.
+                    decodeByteArray(main_account.profile_img,
+                            0, main_account!!.profile_img!!.size)
+            view.current_user_image.setImageBitmap(bitmap)
+        }
+
 
         //TODO: Make is so that hints show
         view.submit_account_changes_button.setOnClickListener{
@@ -76,6 +86,10 @@ class EditAccountFragment : Fragment(){
             main_account.class_standing = if(view.class_standing_editText.text.toString().isBlank())
                 main_account.class_standing else view.class_standing_editText.text.toString()
 
+
+           if(pendingUpload != null )
+                main_account.profile_img = pendingUpload
+
             fragmentManager?.popBackStack()
             //Task to keep the home page labels intact
             activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
@@ -83,17 +97,39 @@ class EditAccountFragment : Fragment(){
 
 
         }
+
         view.reset_credentials.setOnClickListener{
             view.name_editText.text.clear()
             view.phone_number_editText.text.clear()
             view.email_editText.text.clear()
             view.class_standing_editText.text.clear()
+            pendingUpload = null
+
+            if(ezbooksViewModel.user_account.profile_img != null){
+                var bitmap = BitmapFactory.
+                        decodeByteArray(ezbooksViewModel.user_account.profile_img,
+                                0, ezbooksViewModel!!.user_account!!.profile_img!!.size)
+                view.current_user_image.setImageBitmap(bitmap)
+            }
+            else{
+                //TODO: SET IMAGE TO DEFAULT VALUE
+                view.current_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
+            }
         }
 
         view.upload_image_button.setOnClickListener{
             val photoPickerIntent = Intent(Intent.ACTION_PICK)
             photoPickerIntent.type = "image/*"
             startActivityForResult(photoPickerIntent, GET_FROM_GALLERY)
+        }
+
+        if(context!!.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+            view.reset_image_button.setOnClickListener {
+                //TODO: RESET IMAGE TO PREVIOUS
+                dispatchTakePictureIntent()
+                Log.i("Eeron Log", "I Made it!!")
+                //setPic()
+            }
         }
 
         return view
@@ -108,12 +144,13 @@ class EditAccountFragment : Fragment(){
                         createImageFile()
                     } catch (ex: IOException) {
                         // Error occurred while creating the File
+                        println(ex)
                         null
                     }
                     // Continue only if the File was successfully created
                     photoFile?.also {
                         val photoURI: Uri = FileProvider.getUriForFile(
-                                activity!!.applicationContext,
+                                this.context!!,
                                 "com.example.android.fileprovider",
                                 it
                         )
@@ -163,6 +200,9 @@ class EditAccountFragment : Fragment(){
         }
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)?.also { bitmap ->
             current_user_image.setImageBitmap(bitmap)
+            var stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            pendingUpload = stream.toByteArray()
         }
     }
 
@@ -178,29 +218,42 @@ class EditAccountFragment : Fragment(){
                 storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
-            Log.i("Eeron Log 1:" , " I Made IT!")
             mCurrentPhotoPath = absolutePath
+            Log.i("Eeron Log 2:" , " I Made IT! " + mCurrentPhotoPath )
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == Activity.RESULT_OK)
-        when (requestCode) {
-            GET_FROM_GALLERY -> {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.i("Eeron Log 5.1:", " I Made IT! ")
 
-                var selectedImage = data?.getData()
-                try {
-                    var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
-                            ?.getContentResolver(), selectedImage)
-                    current_user_image.setImageBitmap(bitmap)
-                    var stream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                    ezbooksViewModel.user_account.profile_img = stream.toByteArray()
+        if(resultCode == RESULT_OK) {
+            when (requestCode) {
+                GET_FROM_GALLERY -> {
 
-                } catch (e: IOException) {
-                    Log.i("TAG", "Some exception " + e)
+                    var selectedImage = data?.getData()
+                    try {
+                        var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
+                                ?.getContentResolver(), selectedImage)
+                        current_user_image.setImageBitmap(bitmap)
+                        var stream = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                        pendingUpload = stream.toByteArray()
+
+                    } catch (e: IOException) {
+                        Log.i("TAG", "Some exception " + e)
+                    }
                 }
+                REQUEST_IMAGE_CAPTURE ->{
+                    Log.i("Eeron Log 5:", " I Made IT! ")
+                    val imageBitmap = data?.extras?.get("data") as? Bitmap
+                    Log.i("Eeron Log 6:", " I Made IT! ")
+
+                    setPic()
+                    galleryAddPic()
+                    Log.i("Eeron Log 7:", " I Made IT! ")
+                }
+
             }
         }
     }
