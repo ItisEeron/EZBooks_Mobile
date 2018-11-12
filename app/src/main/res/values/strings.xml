@@ -26,4 +26,18 @@
     <string name="senior">Senior</string>
     <string name="name_colon">Name:</string>
     <string name="books_you_are_selling">Books you are selling:</string>
+    <string name="upload_from_camera">Upload From Camera</string>
+    <string name="post_a_book_colon">Post a Books to Sell:</string>
+    <string name="title_colon">Title:</string>
+    <string name="isbn_colon">ISBN:</string>
+    <string name="course_colon">Course:</string>
+    <string name="instructor_colon">Instructor:</string>
+    <string name="title_hint">Title:</string>
+    <string name="isbn_hint">ISBN:</string>
+    <string name="course_hint">Course:</string>
+    <string name="instructor_hint">Instructor:</string>
+
+
+
+
 </resources>

@@ -180,7 +180,7 @@ class MainViewModel : ViewModel() {
 
 
 //TODO:CHECK WITH OTHER EZ-BOOKS MEMBERS TO MAKE SURE INFORMATION IS VALID!!
-data class Textbooks(var Title:String, var isbn:String, var book_img: ByteArray?, var instructor:String, var course:String,
+data class Textbooks(var Title:String, var isbn:String, var book_img: ByteArray?, var instructor:String?, var course:String?,
                      val affiliated_account:UserAccount)
 data class UserAccount(val user_id:Long, var profile_img: ByteArray?, var user_name:String, var email_address:String,
                     var phone_number:String, val date_joined:String, var account_status:Int,

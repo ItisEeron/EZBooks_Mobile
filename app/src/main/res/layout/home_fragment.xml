@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:home_card1="http://schemas.android.com/tools"
+    xmlns:home_card2="http://schemas.android.com/tools"
+    xmlns:home_card3="http://schemas.android.com/tools"
     android:id="@+id/content_frame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -126,11 +128,20 @@
     <android.support.v7.widget.CardView
         android:id="@+id/home_card2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?selectableItemBackground"
+        app:cardBackgroundColor="@color/colorPrimaryDark"
+        home_card2:cardCornerRadius="12dp"
+        home_card2:cardElevation="3dp"
+        home_card2:contentPadding="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/colorPrimaryDark"
             android:orientation="vertical">
 
             <TextView
@@ -160,11 +171,20 @@
     <android.support.v7.widget.CardView
         android:id="@+id/home_card3"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?selectableItemBackground"
+        app:cardBackgroundColor="@color/colorPrimaryDark"
+        home_card3:cardCornerRadius="12dp"
+        home_card3:cardElevation="3dp"
+        home_card3:contentPadding="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/common_google_signin_btn_text_light_default"
             android:orientation="vertical">
 
             <TextView

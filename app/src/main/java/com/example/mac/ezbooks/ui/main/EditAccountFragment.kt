@@ -1,34 +1,27 @@
 package com.example.mac.ezbooks.ui.main
 
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
 import kotlinx.android.synthetic.main.edit_user_account_layout.*
 import kotlinx.android.synthetic.main.edit_user_account_layout.view.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Environment
 import android.support.v4.content.FileProvider
 import android.util.Log
-import kotlinx.android.synthetic.main.home_fragment.view.*
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -65,11 +58,10 @@ class EditAccountFragment : Fragment(){
             var bitmap = BitmapFactory.
                     decodeByteArray(main_account.profile_img,
                             0, main_account!!.profile_img!!.size)
-            view.current_user_image.setImageBitmap(bitmap)
+            view.user_account_Image.setImageBitmap(bitmap)
         }
 
 
-        //TODO: Make is so that hints show
         view.submit_account_changes_button.setOnClickListener{
             val fragmentManager = activity?.supportFragmentManager
 
@@ -109,11 +101,11 @@ class EditAccountFragment : Fragment(){
                 var bitmap = BitmapFactory.
                         decodeByteArray(ezbooksViewModel.user_account.profile_img,
                                 0, ezbooksViewModel!!.user_account!!.profile_img!!.size)
-                view.current_user_image.setImageBitmap(bitmap)
+                view.user_account_Image.setImageBitmap(bitmap)
             }
             else{
                 //TODO: SET IMAGE TO DEFAULT VALUE
-                view.current_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
+                view.user_account_Image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
             }
         }
 
@@ -124,7 +116,7 @@ class EditAccountFragment : Fragment(){
         }
 
         if(context!!.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            view.reset_image_button.setOnClickListener {
+            view.upload_from_camera_button.setOnClickListener {
                 //TODO: RESET IMAGE TO PREVIOUS
                 dispatchTakePictureIntent()
                 Log.i("Eeron Log", "I Made it!!")
@@ -154,13 +146,10 @@ class EditAccountFragment : Fragment(){
                                 "com.example.android.fileprovider",
                                 it
                         )
-                        Log.i("Eeron Log 3:" , " I Made IT!")
 
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                        Log.i("Eeron Log 4:" , " I Made IT!")
 
                         startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
-                        Log.i("Eeron Log 5:" , " I Made IT!")
 
                     }
                 }
@@ -169,20 +158,18 @@ class EditAccountFragment : Fragment(){
 
 
     private fun galleryAddPic() {
-        Log.i("Eeron Log 4:" , " I Made IT!")
         Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
             val f = File(mCurrentPhotoPath)
             mediaScanIntent.data = Uri.fromFile(f)
             activity?.sendBroadcast(mediaScanIntent)
         }
-        Log.i("Eeron Log 7:" , " I Made IT!")
 
     }
 
     private fun setPic() {
         // Get the dimensions of the View
-        val targetW: Int = current_user_image.width
-        val targetH: Int = current_user_image.height
+        val targetW: Int = user_account_Image.width
+        val targetH: Int = user_account_Image.height
 
         val bmOptions = BitmapFactory.Options().apply {
             // Get the dimensions of the bitmap
@@ -199,7 +186,7 @@ class EditAccountFragment : Fragment(){
             inSampleSize = scaleFactor
         }
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)?.also { bitmap ->
-            current_user_image.setImageBitmap(bitmap)
+            user_account_Image.setImageBitmap(bitmap)
             var stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             pendingUpload = stream.toByteArray()
@@ -209,7 +196,6 @@ class EditAccountFragment : Fragment(){
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
-        Log.i("Eeron Log 1:" , " I Made IT!")
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = activity!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
@@ -219,13 +205,11 @@ class EditAccountFragment : Fragment(){
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             mCurrentPhotoPath = absolutePath
-            Log.i("Eeron Log 2:" , " I Made IT! " + mCurrentPhotoPath )
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.i("Eeron Log 5.1:", " I Made IT! ")
 
         if(resultCode == RESULT_OK) {
             when (requestCode) {
@@ -235,7 +219,7 @@ class EditAccountFragment : Fragment(){
                     try {
                         var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
                                 ?.getContentResolver(), selectedImage)
-                        current_user_image.setImageBitmap(bitmap)
+                        user_account_Image.setImageBitmap(bitmap)
                         var stream = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
                         pendingUpload = stream.toByteArray()
@@ -245,13 +229,10 @@ class EditAccountFragment : Fragment(){
                     }
                 }
                 REQUEST_IMAGE_CAPTURE ->{
-                    Log.i("Eeron Log 5:", " I Made IT! ")
                     val imageBitmap = data?.extras?.get("data") as? Bitmap
-                    Log.i("Eeron Log 6:", " I Made IT! ")
 
                     setPic()
                     galleryAddPic()
-                    Log.i("Eeron Log 7:", " I Made IT! ")
                 }
 
             }

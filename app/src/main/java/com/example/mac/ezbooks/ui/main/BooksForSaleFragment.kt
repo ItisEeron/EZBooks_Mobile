@@ -1,6 +1,5 @@
 package com.example.mac.ezbooks.ui.main
 
-import android.accounts.Account
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -10,15 +9,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.mac.ezbooks.R
+import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.R_B_RecyclerAdapter
+import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.UploadBooksRecyclerAdapter
 import kotlinx.android.synthetic.main.books_for_sale_layout.*
-import kotlinx.android.synthetic.main.home_fragment.*
 
 class BooksForSaleFragment : Fragment() {
     private lateinit var booksViewModel : MainViewModel
     private lateinit var main_Account: UserAccount
 
     private lateinit var uploadedBookslayoutManager: RecyclerView.LayoutManager
-    private lateinit var uploadedBooksadapter: RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>
+    private lateinit var uploadedBooksadapter: RecyclerView.Adapter<UploadBooksRecyclerAdapter.ViewHolder>
     private lateinit var uploadedBooksRecyclerview : RecyclerView
 
     override fun onCreate(savedInstanceState : Bundle?) {
@@ -43,7 +43,7 @@ class BooksForSaleFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         uploadedBooksRecyclerview = bfs_page_recycler_view
-        uploadedBooksadapter = R_B_RecyclerAdapter(this, booksViewModel)
+        uploadedBooksadapter = UploadBooksRecyclerAdapter(this, booksViewModel)
         uploadedBooksRecyclerview.adapter = uploadedBooksadapter
         uploadedBookslayoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         uploadedBooksRecyclerview.layoutManager = uploadedBookslayoutManager

@@ -1,8 +1,5 @@
-package com.example.mac.ezbooks.ui.main
+package com.example.mac.ezbooks.ui.main.RecyclerView_Adapters
 
-import android.app.Activity
-import android.content.ClipData
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -14,26 +11,30 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
-
+import com.example.mac.ezbooks.ui.main.MainViewModel
 
 //Passes in Fragment in order to determine which List to use
 //If the Fragment is the HomeFragment, we only want the views to populate the with at most
 //5 Books
 //Other instances (Requested Books, Search, and Uploaded) will show maximum
 //Search will have filtering options and will actually only display the first 40 books
-class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : MainViewModel): RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>() {
+class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel : MainViewModel): RecyclerView.Adapter<UploadBooksRecyclerAdapter.ViewHolder>() {
 
 
     inner class ViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView){
         var itemImage: ImageView
         var itemTitle: TextView
-        var itemDetail: TextView
+        var itemISBN: TextView
+        var itemAccount : TextView
 
-        init {
+
+        init { //Initalize variables for the holder
             itemImage = itemView.findViewById(R.id.item_image)
             itemTitle = itemView.findViewById(R.id.item_title)
-            itemDetail = itemView.findViewById(R.id.item_detail)
+            itemISBN = itemView.findViewById(R.id.item_isbn)
+            itemAccount = itemView.findViewById(R.id.item_account)
 
+            //This will allow the object to invoke an event when clicked on!!!
             itemView.setOnClickListener{view ->
                 var position: Int = getAdapterPosition()
 
@@ -45,6 +46,7 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ViewHolder {
+        //TODO: add uploaded_book_card_layout and replace request_book_card_layout with this
         val v = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.requested_book_card_layout, viewGroup, false)
         return ViewHolder(v)
@@ -53,12 +55,13 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
     override fun onBindViewHolder(viewHolder: ViewHolder, i: Int) {
         //TODO: ADD CONDITIONS FOR SELLING TEXTBOOKS AS WELL
         if(fragment is HomeFragment) {
-            viewHolder.itemTitle.text = viewModel.recent_requested_Textbooks[i].Title
-            viewHolder.itemDetail.text = viewModel.recent_requested_Textbooks[i].isbn
-            if(viewModel.recent_requested_Textbooks[i].book_img != null){
+            viewHolder.itemTitle.text = viewModel.recent_selling_Textbooks[i].Title
+            viewHolder.itemISBN.text = viewModel.recent_selling_Textbooks[i].isbn
+            viewHolder.itemAccount.text = viewModel.recent_selling_Textbooks[i].affiliated_account.user_name
+            if(viewModel.recent_selling_Textbooks[i].book_img != null){
                 var bitmap = BitmapFactory.
-                        decodeByteArray(viewModel.recent_requested_Textbooks[i].book_img,
-                                0, viewModel.recent_requested_Textbooks[i].book_img!!.size)
+                        decodeByteArray(viewModel.recent_selling_Textbooks[i].book_img,
+                                0, viewModel.recent_selling_Textbooks[i].book_img!!.size)
                 viewHolder.itemImage.setImageBitmap(bitmap)
 
             }else{
@@ -66,12 +69,13 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
             }
         }
         else{
-            viewHolder.itemTitle.text = viewModel.requested_textbooks[i].Title
-            viewHolder.itemDetail.text = viewModel.requested_textbooks[i].isbn
-            if(viewModel.requested_textbooks[i].book_img != null){
+            viewHolder.itemTitle.text = viewModel.selling_textbooks[i].Title
+            viewHolder.itemISBN.text = viewModel.selling_textbooks[i].isbn
+            viewHolder.itemAccount.text = viewModel.selling_textbooks[i].affiliated_account.user_name
+            if(viewModel.selling_textbooks[i].book_img != null){
                 var bitmap = BitmapFactory.
-                        decodeByteArray(viewModel.requested_textbooks[i].book_img,
-                                0, viewModel.requested_textbooks[i].book_img!!.size)
+                        decodeByteArray(viewModel.selling_textbooks[i].book_img,
+                                0, viewModel.selling_textbooks[i].book_img!!.size)
                 viewHolder.itemImage.setImageBitmap(bitmap)
 
             }else{
@@ -81,7 +85,8 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
     }
 
     override fun getItemCount(): Int {
-        return if(fragment is HomeFragment) viewModel.recent_requested_Textbooks.size else viewModel.requested_textbooks.size
+        return if(fragment is HomeFragment) viewModel.recent_selling_Textbooks.size
+        else viewModel.selling_textbooks.size
     }
 
 

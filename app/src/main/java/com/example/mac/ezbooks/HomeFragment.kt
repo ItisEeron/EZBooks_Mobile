@@ -1,9 +1,6 @@
 package com.example.mac.ezbooks
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -14,11 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.mac.ezbooks.ui.main.*
-import kotlinx.android.synthetic.main.edit_user_account_layout.view.*
+import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.R_B_RecyclerAdapter
+import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.UploadBooksRecyclerAdapter
 import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.home_fragment.view.*
 //import kotlinx.android.synthetic.main.item_row.view.*
-import java.io.ByteArrayOutputStream
 
 
 class HomeFragment : Fragment() {
@@ -39,7 +36,7 @@ class HomeFragment : Fragment() {
 
     //For second Recycler View Posted Listings
     private lateinit var uploadedBookslayoutManager: RecyclerView.LayoutManager
-    private lateinit var uploadedBooksadapter: RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>
+    private lateinit var uploadedBooksadapter: RecyclerView.Adapter<UploadBooksRecyclerAdapter.ViewHolder>
     private lateinit var uploadedBooksRecyclerview : RecyclerView
 
 
@@ -123,7 +120,7 @@ class HomeFragment : Fragment() {
 
         //The second set of cards is set up beneath the first set
         uploadedBooksRecyclerview = home_uploaded_books_recyclerview1
-        uploadedBooksadapter = R_B_RecyclerAdapter(this, booksViewModel)
+        uploadedBooksadapter = UploadBooksRecyclerAdapter(this, booksViewModel)
         uploadedBooksRecyclerview.adapter = uploadedBooksadapter
         uploadedBookslayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         uploadedBooksRecyclerview.layoutManager = uploadedBookslayoutManager

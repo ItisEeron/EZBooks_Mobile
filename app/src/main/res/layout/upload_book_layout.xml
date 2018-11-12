@@ -1,7 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/upload_book_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/post_book_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/post_a_book_colon"
+        android:textAppearance="@android:style/TextAppearance.Large" />
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/upload_image_card"
+        android:layout_width="match_parent"
+        android:layout_height="163dp">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/upload_image_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/upload_image_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="183dp"
+                android:text="@string/upload_an_image"
+                android:textAppearance="@android:style/TextAppearance.Large"
+                app:layout_constraintBottom_toTopOf="@+id/upload_book_Image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/upload_book_Image"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/ic_launcher_background"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/upload_image_label"
+                app:srcCompat="@mipmap/ic_launcher"
+                tools:ignore="VectorDrawableCompat" />
+
+            <Button
+                android:id="@+id/upload_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/upload_book_Image"
+                android:layout_toStartOf="@+id/upload_image_label"
+                android:text="@string/upload_from_device"
+                app:layout_constraintBottom_toTopOf="@+id/upload_from_camera_button"
+                app:layout_constraintStart_toEndOf="@+id/upload_image_label"
+                app:layout_constraintTop_toTopOf="@+id/upload_book_Image" />
+
+            <Button
+                android:id="@+id/upload_from_camera_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/upload_image_button"
+                android:layout_alignStart="@+id/upload_image_button"
+                android:text="@string/upload_from_camera"
+                app:layout_constraintBottom_toBottomOf="@+id/upload_book_Image"
+                app:layout_constraintStart_toEndOf="@+id/upload_image_label" />
+
+
+        </android.support.constraint.ConstraintLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+    <LinearLayout
+        android:id="@+id/text_credentials_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/book_title_label"
+                android:layout_width="73dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/title_colon"
+                android:textAppearance="@android:style/TextAppearance.Holo.Widget.EditText" />
+
+            <EditText
+                android:id="@+id/book_title_editText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Kotlin in Action"
+                android:importantForAutofill="no"
+                android:inputType="textPersonName" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/book_isbn_lable"
+                android:layout_width="73dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/isbn_colon"
+                android:textAppearance="@android:style/TextAppearance.Holo.Widget.EditText" />
+
+            <EditText
+                android:id="@+id/book_isbn_editText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="9781617293290"
+                android:importantForAutofill="no"
+                android:inputType="text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/book_course_label"
+                android:layout_width="73dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/course_colon"
+                android:textAppearance="@android:style/TextAppearance.Holo.Widget.EditText" />
+
+            <EditText
+                android:id="@+id/book_course_editText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="CSC 436 Mobile App Development"
+                android:importantForAutofill="no"
+                android:inputType="textPersonName" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/book_instructor_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/instructor_colon"
+                android:textAppearance="@android:style/TextAppearance.Holo.Widget.EditText" />
+
+            <EditText
+                android:id="@+id/book_instructor_editText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:ems="10"
+                android:hint="--------- Scoville"
+                android:inputType="textPersonName" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/submit_book_button"
+                android:layout_width="181dp"
+                android:layout_height="wrap_content"
+                android:text="@string/submit" />
+
+            <Button
+                android:id="@+id/reset_book_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reset" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
