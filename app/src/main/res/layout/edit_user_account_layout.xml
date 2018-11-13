@@ -26,7 +26,7 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/upload_image_label"
+                android:id="@+id/reported_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -49,7 +49,7 @@
                 android:background="@drawable/ic_launcher_background"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/upload_image_label"
+                app:layout_constraintTop_toBottomOf="@+id/reported_user_name"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:ignore="VectorDrawableCompat" />
 
@@ -58,10 +58,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/user_account_Image"
-                android:layout_toStartOf="@+id/upload_image_label"
+                android:layout_toStartOf="@+id/reported_user_name"
                 android:text="@string/upload_from_device"
                 app:layout_constraintBottom_toTopOf="@+id/upload_from_camera_button"
-                app:layout_constraintStart_toEndOf="@+id/upload_image_label"
+                app:layout_constraintStart_toEndOf="@+id/reported_user_name"
                 app:layout_constraintTop_toTopOf="@+id/user_account_Image" />
 
             <Button
@@ -72,7 +72,7 @@
                 android:layout_alignStart="@+id/upload_image_button"
                 android:text="@string/upload_from_camera"
                 app:layout_constraintBottom_toBottomOf="@+id/user_account_Image"
-                app:layout_constraintStart_toEndOf="@+id/upload_image_label" />
+                app:layout_constraintStart_toEndOf="@+id/reported_user_name" />
 
 
         </android.support.constraint.ConstraintLayout>

@@ -127,4 +127,6 @@ class HomeFragment : Fragment() {
 
     }
 
+    //TODO: FIX BACKPRESSED TO SYNC WITH HOME FRAGMENT (or LOGIN) BEING THE MAIN FRAGMENT
+
 }

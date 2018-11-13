@@ -96,7 +96,7 @@ class UploadBookFragment : Fragment(){
             view.book_instructor_editText.text.clear()
             pendingUpload = null
 
-            view.upload_book_Image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
+            view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
 
         }
 
@@ -166,8 +166,8 @@ class UploadBookFragment : Fragment(){
 
     private fun setPic() {
         // Get the dimensions of the View
-        val targetW: Int = upload_book_Image.width
-        val targetH: Int = upload_book_Image.height
+        val targetW: Int = reported_user_image.width
+        val targetH: Int = reported_user_image.height
 
         val bmOptions = BitmapFactory.Options().apply {
             // Get the dimensions of the bitmap
@@ -184,7 +184,7 @@ class UploadBookFragment : Fragment(){
             inSampleSize = scaleFactor
         }
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)?.also { bitmap ->
-            upload_book_Image.setImageBitmap(bitmap)
+            reported_user_image.setImageBitmap(bitmap)
             var stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             pendingUpload = stream.toByteArray()
@@ -217,7 +217,7 @@ class UploadBookFragment : Fragment(){
                     try {
                         var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
                                 ?.getContentResolver(), selectedImage)
-                        upload_book_Image.setImageBitmap(bitmap)
+                        reported_user_image.setImageBitmap(bitmap)
                         var stream = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
                         pendingUpload = stream.toByteArray()

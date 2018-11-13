@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
+import com.example.mac.ezbooks.detail_fragments.RequestedBookDetailFragment
 import com.example.mac.ezbooks.ui.main.MainViewModel
 
 
@@ -35,11 +36,12 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
             itemAccount = itemView.findViewById(R.id.item_account)
 
             itemView.setOnClickListener{view ->
-                var position: Int = getAdapterPosition()
-
+                var position: Int = adapterPosition
+                viewModel.selected_requested = viewModel.requested_textbooks[position]
                 //TODO: Call Fragment that shows detailed information based on the book
-                Snackbar.make(view, "Click detected on item $position",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                 fragment.activity?.supportFragmentManager?.beginTransaction()?.
+                        setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
+                        RequestedBookDetailFragment())?.addToBackStack(null)?.commit()
             }
         }
     }
