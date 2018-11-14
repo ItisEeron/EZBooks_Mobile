@@ -1,4 +1,4 @@
-package com.example.mac.ezbooks.ui.main
+package com.example.mac.ezbooks.detail_fragments
 
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
@@ -19,6 +19,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.mac.ezbooks.R
+import com.example.mac.ezbooks.ui.main.MainViewModel
+import com.example.mac.ezbooks.ui.main.Textbooks
+import kotlinx.android.synthetic.main.books_for_sale_layout.view.*
 import kotlinx.android.synthetic.main.upload_book_layout.*
 import kotlinx.android.synthetic.main.upload_book_layout.view.*
 import java.io.ByteArrayOutputStream
@@ -27,7 +30,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class UploadBookFragment : Fragment(){
+class EditListingFragment : Fragment() {
     private lateinit var booksViewModel : MainViewModel
     private lateinit var mCurrentPhotoPath: String
     private lateinit var newTextbooks : Textbooks
@@ -38,54 +41,46 @@ class UploadBookFragment : Fragment(){
     val RECENT_LIST_SIZE = 5
 
 
-    override fun onCreate(savedInstanceState : Bundle?) {
-        //Super allows the original function to execute then you add your own code
-        super.onCreate(savedInstanceState)
-        activity?.title = "Upload a Book to Sell"
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.upload_book_layout, container, false)
 
         booksViewModel = activity?.run {
-            ViewModelProviders.of(this).get(MainViewModel::class.java) }
+            ViewModelProviders.of(this).get(MainViewModel::class.java)
+        }
                 ?: throw Exception("Invalid Activity")
+
+        view.post_book_label.text = "Edit a Book:"
+        view.submit_book_button.text = "Submit Edits"
 
 
         view.submit_book_button.setOnClickListener {
 
-            if(!book_title_editText.text.isBlank() && !book_isbn_editText.text.isBlank()){//Want these two attribute filled!!!
-                newTextbooks = Textbooks(book_title_editText.text.toString(),
-                        book_isbn_editText.text.toString(), null,
-                        book_course_editText.text.toString(),
-                        book_instructor_editText.text.toString(), booksViewModel.user_account, null)
-                if(pendingUpload != null)
-                    newTextbooks.book_img = pendingUpload
-
-                //Add the new text books into view model (it will store it into the database)
-                booksViewModel.selling_textbooks.add(0, newTextbooks)
-
-                //Update recent_selling_Textbooks on phone so we do not have to wait for database
-                booksViewModel.recent_selling_Textbooks.add(0,newTextbooks)
-                if(booksViewModel.recent_selling_Textbooks.size > RECENT_LIST_SIZE)
-                    booksViewModel.recent_selling_Textbooks.removeAt(RECENT_LIST_SIZE)
-
-
-                //Navigate back home
-                fragmentManager?.popBackStack()
-                //Task to keep the home page labels intact
-                activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
-                activity?.title ="EZ Books Home"
-
-                Toast.makeText(activity,
-                        "You have successfully posted a textbook!",
-                        Toast.LENGTH_LONG).show()
+            //TODO: COPY METHOD BREAKS
+            if(!book_title_editText.text.isBlank()) {
+                booksViewModel.selected_selling.Title = book_title_editText.text.toString()
             }//if
-            else {
-               Toast.makeText(activity,
-                       "Please enter a title and isbn for your book!!!",
-                       Toast.LENGTH_LONG).show()
-            }//else
+            if(!book_isbn_editText.text.isBlank()){
+                booksViewModel.selected_selling.isbn = book_isbn_editText.text.toString()
+            }//if
+            if(!book_course_editText.text.isBlank()){
+                booksViewModel.selected_selling.course = book_course_editText.text.toString()
+            }//if
+            if(!book_instructor_editText.text.isBlank()){
+                booksViewModel.selected_selling.instructor = book_instructor_editText.text.toString()
+            }//if
+
+            if(pendingUpload != null)
+                    booksViewModel.selected_selling.book_img = pendingUpload
+
+            //Navigate back home
+            fragmentManager?.popBackStack()
+            //Task to keep the home page labels intact
+            activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
+            activity?.title ="EZ Books Home"
+
+            Toast.makeText(activity, "You have editted your textbook!",
+                    Toast.LENGTH_LONG).show()
+
 
         }//view.submit_book_button.setOnClickListener
 
@@ -123,6 +118,13 @@ class UploadBookFragment : Fragment(){
 
 
         return view
+    }
+
+
+    override fun onCreate(savedInstanceState : Bundle?) {
+        //Super allows the original function to execute then you add your own code
+        super.onCreate(savedInstanceState)
+        activity?.title = "Edit a Book to Sell"
     }
 
     private fun dispatchTakePictureIntent() {

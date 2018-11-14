@@ -92,6 +92,7 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
                     }
                 }
 
+
                 //Now Remove the Book So the User does not have to deal with an unwanted seller!!
                 if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){
                     booksViewModel.recent_requested_Textbooks.remove(booksViewModel.selected_requested)

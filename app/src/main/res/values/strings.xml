@@ -48,4 +48,7 @@
     <string name="other_colon">Other:</string>
     <string name="if_other_explain">Please explain why:</string>
     <string name="cancel">Cancel</string>
+    <string name="remove">Remove</string>
+    <string name="edit">Edit</string>
+    <string name="users_who_want_to_buy">Users who want to purchase your book:</string>
 </resources>

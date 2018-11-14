@@ -8,9 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
-import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.ui.main.MainViewModel
+import com.example.mac.ezbooks.ui.main.Potential_Buyer
 import com.example.mac.ezbooks.ui.main.Textbooks
 import kotlinx.android.synthetic.main.detail_requested_books_layout.view.*
 
@@ -34,11 +34,33 @@ class RequestedBookDetailFragment : Fragment() {
         view.detail_requested_book_course.text = booksViewModel.selected_requested.course
         view.detail_requested_book_instructor.text = booksViewModel.selected_requested.instructor
 
-        view.detail_requested_book_seller.text = booksViewModel.selected_requested.affiliated_account.user_name
-        view.detail_requested_book_phone_number.text = booksViewModel.selected_requested.affiliated_account.phone_number
-        view.detail_requested_book_email.text = booksViewModel.selected_requested.affiliated_account.email_address
 
-        view.unrequest_button.setOnClickListener{
+        view.detail_requested_book_seller.text = booksViewModel.selected_requested.affiliated_account.user_name
+
+        //First check to see if the selected list of buyers is null (it should not!!)
+        var isAproved = false
+        if(booksViewModel.selected_requested.potential_buyers != null){
+            //Find your id
+            for( potentialbuyeraccount : Potential_Buyer in booksViewModel.selected_requested.potential_buyers!!) {
+                if(potentialbuyeraccount.account_id == booksViewModel.user_account.user_id){//When found check if your id has been approved
+                    isAproved = potentialbuyeraccount.approved
+                    break
+                }
+            }
+            if(isAproved) {//If Id
+                view.detail_requested_book_phone_number.text = booksViewModel.selected_requested.affiliated_account.phone_number
+                view.detail_requested_book_email.text = booksViewModel.selected_requested.affiliated_account.email_address
+            }else{
+                view.detail_requested_book_phone_number.text = "Not Authorized to View Information"
+                view.detail_requested_book_email.text = "Not Authorized to View Information"
+            }
+        }
+        else {//If null for whatever reason, show not authorized
+            view.detail_requested_book_phone_number.text = "Not Authorized to View Information"
+            view.detail_requested_book_email.text = "Not Authorized to View Information"
+        }
+
+        view.remove_button.setOnClickListener{
          //TODO: remove this referenced listing in the data base. Any connection made between this textbook and user should be removed
 
             //Update the home page view...Remove the book if it is found in the homepage recycler view, also adjust the view when removed
@@ -51,14 +73,20 @@ class RequestedBookDetailFragment : Fragment() {
             }
             booksViewModel.requested_textbooks.remove(booksViewModel.selected_requested)
 
+            //Remove if the id of the current user
+            booksViewModel.selected_requested.potential_buyers!!.removeIf { Potential_Buyer->
+                Potential_Buyer.account_id == booksViewModel.user_account.user_id
+            }
+
             val fragmentManager = activity?.supportFragmentManager
             fragmentManager?.popBackStack()
 
             Toast.makeText(activity,
                     "You have successfully removed the requested textbook!",
-                    Toast.LENGTH_LONG).show()        }
+                    Toast.LENGTH_LONG).show()
+        }
 
-        view.report_button.setOnClickListener{
+        view.edit_button.setOnClickListener{
             activity?.supportFragmentManager?.beginTransaction()?.
                     setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
                     ReportUserFragment())?.addToBackStack(null)?.commit()

@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
+import com.example.mac.ezbooks.detail_fragments.SellingBookDetailFragment
 import com.example.mac.ezbooks.ui.main.MainViewModel
 
 //Passes in Fragment in order to determine which List to use
@@ -38,9 +39,11 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
             itemView.setOnClickListener{view ->
                 var position: Int = getAdapterPosition()
 
-                //TODO: Call Fragment that shows detailed information based on the book
-                Snackbar.make(view, "Click detected on item $position",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                viewModel.selected_selling = viewModel.selling_textbooks[position]
+
+                fragment.activity?.supportFragmentManager?.beginTransaction()?.
+                        setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
+                        SellingBookDetailFragment())?.addToBackStack(null)?.commit()
             }
         }
     }
