@@ -74,8 +74,10 @@ class RequestedBookDetailFragment : Fragment() {
             booksViewModel.requested_textbooks.remove(booksViewModel.selected_requested)
 
             //Remove if the id of the current user
-            booksViewModel.selected_requested.potential_buyers!!.removeIf { Potential_Buyer->
-                Potential_Buyer.account_id == booksViewModel.user_account.user_id
+            if(booksViewModel.selected_requested.potential_buyers != null) {
+                booksViewModel.selected_requested.potential_buyers!!.removeIf { Potential_Buyer ->
+                    Potential_Buyer.account_id == booksViewModel.user_account.user_id
+                }
             }
 
             val fragmentManager = activity?.supportFragmentManager
