@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "191842110130",
+    "firebase_url": "https://ez-books.firebaseio.com",
+    "project_id": "ez-books",
+    "storage_bucket": "ez-books.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:191842110130:android:21314e7c96cde50d",
+        "android_client_info": {
+          "package_name": "com.example.mac.ezbooks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "191842110130-e8bkreea1e2k4c5ec05igg8s515joa6f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcE13mmsnuOK9DSnYYiZyaPbiNw8tc7Wo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
