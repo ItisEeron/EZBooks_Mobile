@@ -66,28 +66,28 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
             if (reportString != null) {
                 //Test to see if the user has never been reported! If not, initalize reported
                 //reasons map
-                if (reported_Account.reported_flags.reported_reasons == null)
-                    reported_Account.reported_flags.reported_reasons = mutableMapOf(Pair<String, Int>(reportString, 0))
+                if (reported_Account.reported_flags!!.reported_reasons == null)
+                    reported_Account.reported_flags!!.reported_reasons = mutableMapOf(Pair<String, Int>(reportString, 0))
 
                 //Test to see if the user has been reported for the reported reason!!
-                if(!(reported_Account.reported_flags.reported_reasons!!.containsKey(reportString))){
-                    reported_Account.reported_flags.reported_reasons!!.put(reportString, 1)
+                if(!(reported_Account.reported_flags!!.reported_reasons!!.containsKey(reportString))){
+                    reported_Account.reported_flags!!.reported_reasons!!.put(reportString, 1)
                 }else{
-                    var i = reported_Account.reported_flags.reported_reasons!![reportString]
+                    var i = reported_Account.reported_flags!!.reported_reasons!![reportString]
                     i = i!!.plus(1)
-                    reported_Account.reported_flags.reported_reasons!![reportString] = i
+                    reported_Account.reported_flags!!.reported_reasons!![reportString] = i
                 }
 
                 //Want to add to the other reasons log!!! //RECALL OTHERS WILL NOT READ FROM DATABASE
                 //TO APP, IT IS STRICTLY FOR LOGGING PURPOSES
                 if(reportString == "Other"){
                     //No reason has been given to the user yet, then create the arraylist
-                    if (reported_Account.reported_flags.other_reason_log == null){
-                        reported_Account.reported_flags.other_reason_log = arrayListOf()
+                    if (reported_Account!!.reported_flags!!.other_reason_log == null){
+                        reported_Account!!.reported_flags!!.other_reason_log = arrayListOf()
                     }
                     //Now input the string of characters for the reason inputted
                     if(!(view.other_explaination.text.isEmpty())) {
-                        reported_Account.reported_flags.other_reason_log!!
+                        reported_Account!!.reported_flags!!.other_reason_log!!
                                 .add(view.other_explaination.text.toString())
                     }
                 }

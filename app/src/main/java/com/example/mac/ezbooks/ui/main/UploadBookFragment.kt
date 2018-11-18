@@ -120,11 +120,11 @@ class UploadBookFragment : Fragment(){
                     "You don't have a camera silly!",
                     Toast.LENGTH_SHORT).show()
         }
-
-
         return view
     }
 
+
+    //TODO: TO REDUCE CODE SMELL, MAKE SURE YOU PUT ALL OTHER LOCAL FUNCTIONS OF CAMERA INTO ITS OWN FILE
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
