@@ -4,7 +4,13 @@ import android.arch.lifecycle.ViewModel
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
+import android.support.v4.app.Fragment
 import com.example.mac.ezbooks.R
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 
 class MainViewModel : ViewModel() {
@@ -16,6 +22,18 @@ class MainViewModel : ViewModel() {
     lateinit var recent_requested_Textbooks: MutableList<Textbooks>
     lateinit var recent_selling_Textbooks: MutableList<Textbooks>
     private val RECENTS_SIZE = 5
+    private val databaseManager = FirebaseDatabaseManager()
+    private val database = FirebaseDatabase.getInstance()
+
+    private val KEY_ACCOUNT = "account"
+    private val KEY_TEXTBOOK = "textbook"
+    private val KEY_REPORTS = "reports"
+    private val KEY_CLASS = "class_standing"
+    private val KEY_EMAIL = "email"
+    private val KEY_NAME = "name"
+    private val KEY_ID = "id"
+    private val KEY_PHONE = "phone_number"
+    private val KEY_PROF = "profile_img"
 
     //Temporary Data///////////////////////////////////////////////////
     //TODO: GET THIS DATA TO SHOW TEXTBOOKS INSTEAD OF THESE TEMP BOOK
@@ -50,7 +68,11 @@ class MainViewModel : ViewModel() {
             loadTextbookbuying()
         }
         if(!::user_account.isInitialized){
-            getUserAccount()
+            user_account =  UserAccount(null, null,null,
+                    null, null, "5/17/18",
+                    0, null, null)
+            //getUserAccount()
+
         }
 
     }
@@ -162,21 +184,11 @@ class MainViewModel : ViewModel() {
     }
 
 
-    fun getUserAccount():UserAccount {
-        // Do an asynchronous operation to fetch users
-
-        //DO work in SucessListener for reading from database.. This will allow information to update
-        //AFTER the data has been retrieved
-        // This function will gather the data from the servers, however, we are using dummy data right now
+    fun getUserAccount(fragment: Fragment){
+        // Do an asynchronous operation to fetch user
         // TODO: Get data from database; using fake data for now
-        user_account =  UserAccount(104955L, null,"Eeron Grant",
-                "eerongrant@gmail.com", "9255663812", "5/17/18",
-                0, "Senior", Reports(0, null,
-                null))
-        return user_account
+        databaseManager.retrieveAccount(104955L, this, fragment)
     }//getUserAccount
-
-
 }
 
 
@@ -184,9 +196,9 @@ class MainViewModel : ViewModel() {
 //TODO: ADD A MUTABLE MAP IN TEXTBOOKS TO ALLOW THE SELLER TO CLEAR USERS TO VIEW THEIR INFORMATION
 data class Textbooks(var Title:String, var isbn:String, var book_img: ByteArray?, var instructor:String?, var course:String?,
                      val affiliated_account:UserAccount, var potential_buyers: MutableList<Potential_Buyer>?)
-data class UserAccount(val user_id:Long, var profile_img: ByteArray?, var user_name:String, var email_address:String,
-                    var phone_number:String, val date_joined:String, var account_status:Int,
-                    var class_standing:String, var reported_flags:Reports)
+data class UserAccount(var user_id:Long?, var profile_img: ByteArray?, var user_name:String?, var email_address:String?,
+                    var phone_number:String?, val date_joined:String?, var account_status:Int,
+                    var class_standing:String?, var reported_flags:Reports?)
 data class Reports(var num_of_flags:Int, var reported_reasons: MutableMap<String, Int>?,
                    var other_reason_log : ArrayList<String>?)
 data class Potential_Buyer(val account_id:Long, var account_name:String, var approved:Boolean)

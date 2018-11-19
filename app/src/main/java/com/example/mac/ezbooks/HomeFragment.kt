@@ -50,7 +50,8 @@ class HomeFragment : Fragment() {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
 
-        main_Account = booksViewModel.getUserAccount()
+        booksViewModel.getUserAccount(this)
+
     }
 
 
@@ -68,7 +69,6 @@ class HomeFragment : Fragment() {
                     decodeByteArray(booksViewModel.user_account.profile_img,
                             0, booksViewModel!!.user_account!!.profile_img!!.size)
 
-            //TODO: SCALE IMAGES TO SIZE OF CardImageView also allow user to center on image selected
             view.home_card1.card_user_image.setImageBitmap(bitmap)
         }
         //This Shows the Current Accounts Status and Changes the values as neccessarry
@@ -101,7 +101,6 @@ class HomeFragment : Fragment() {
                     EditAccountFragment())?.addToBackStack(null)?.commit()
         }
 
-
         return view
     }
 
@@ -125,8 +124,6 @@ class HomeFragment : Fragment() {
         uploadedBookslayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         uploadedBooksRecyclerview.layoutManager = uploadedBookslayoutManager
 
+
     }
-
-    //TODO: FIX BACKPRESSED TO SYNC WITH HOME FRAGMENT (or LOGIN) BEING THE MAIN FRAGMENT
-
 }

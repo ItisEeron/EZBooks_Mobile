@@ -15,20 +15,38 @@ import android.support.v7.widget.Toolbar
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
+import com.example.mac.ezbooks.loginAccount.ChangePassword
+import com.example.mac.ezbooks.loginAccount.LoginFragment
+import com.example.mac.ezbooks.loginAccount.VerifyAccount
+import com.google.firebase.database.FirebaseDatabase
 import com.example.mac.ezbooks.ui.main.*
 import kotlinx.android.synthetic.main.activity_main.*
 
+/*
+The Main Activity. Currently, the only part of the firebase database that is read is currently
+a single account from a user. You should be able to edit this. If you rerun the app, you will notice
+that the credentials of the account will have changed to the new account.
 
+Textbooks are builtin in, they still need to be populated into the database. I also still need
+to set these values into the database.
+
+Also, I still need to implemented a login feature and a create account feature. The account currently
+viewed is one already inputted into the database.
+ */
 
 class MainActivity : AppCompatActivity() {
 
     //This is for fragments!!!!!
     private lateinit var mainDrawerLayout: DrawerLayout
     private lateinit var booksViewModel: MainViewModel
+    private lateinit var databaseManager: FirebaseDatabaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        databaseManager = FirebaseDatabaseManager()
+
 
         //This sets up the layout for the items in the drawer
         mainDrawerLayout = findViewById(R.id.drawer_layout)
@@ -36,6 +54,10 @@ class MainActivity : AppCompatActivity() {
         //Sets up very first viewModel for all fragments to reference
         booksViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
+        //Testing Database info
+        databaseManager.createUser("10005", "Tin Goose" , "tinigoose@gmail.com")
+        //databaseManager.retrieveAccount(104955L, booksViewModel)
+        //Testing Database info
 
         //Now time to initialize the navigation click events, will not present anything!!!!
         val navigationView : NavigationView = nav_view
@@ -156,13 +178,25 @@ class MainActivity : AppCompatActivity() {
                         SearchFragment()).addToBackStack("searchShop").commit()
             }
             R.id.nav_change_password->{
-
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                                R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
+                                ChangePassword()).addToBackStack("changePassword").commit()
             }
             R.id.nav_verify_account->{
-
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                                R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
+                                VerifyAccount()).addToBackStack("verifyAccount").commit()
             }
             R.id.nav_sign_out->{
-
+                supportFragmentManager.beginTransaction().
+                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
+                                R.anim.abc_fade_in,R.anim.abc_fade_out).
+                        replace(R.id.flContent,
+                                LoginFragment()).addToBackStack("Login").commit()
             }
             else -> {
                 if (supportFragmentManager.backStackEntryCount == 0) {
@@ -199,12 +233,28 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_search_shop->{
                 displayScreen(item.itemId)
             }
+            R.id.nav_change_password-> {
+                displayScreen(item.itemId)
+            }
+            R.id.nav_verify_account-> {
+                displayScreen(item.itemId)
+            }
+            R.id.nav_sign_out->{
+                displayScreen(item.itemId)
+            }
 
         }
 
         //displayScreen(item.itemId)
         mainDrawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onBackPressed() {
+        if(supportFragmentManager.backStackEntryCount == 1){
+            supportFragmentManager.popBackStack()
+        }
+        super.onBackPressed()
     }
 
 }//Main Activity

@@ -20,6 +20,7 @@ import android.graphics.BitmapFactory
 import android.os.Environment
 import android.support.v4.content.FileProvider
 import android.util.Log
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -79,8 +80,10 @@ class EditAccountFragment : Fragment(){
                 main_account.class_standing else view.class_standing_editText.text.toString()
 
 
-           if(pendingUpload != null )
+            if(pendingUpload != null )
                 main_account.profile_img = pendingUpload
+
+            FirebaseDatabaseManager().updateAccount(main_account)
 
             fragmentManager?.popBackStack()
             //Task to keep the home page labels intact
