@@ -30,8 +30,6 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
-        reported_Account= booksViewModel.selected_requested.affiliated_account
-
 
         //Initialize the Spinner
         spinner = view.findViewById(R.id.reported_reasons_spinner)
@@ -51,8 +49,8 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         //Time to initialze the remaining view
         //Add to the name and the image. That is all!!
-        view.reported_user_name.text = reported_Account.user_name
-        if(reported_Account.profile_img != null){
+        view.reported_user_name.text = booksViewModel.selected_requested.user_name
+        /*if(reported_Account.profile_img != null){
             var bitmap = BitmapFactory.
             decodeByteArray(reported_Account.profile_img,
                     0, reported_Account!!.profile_img!!.size)
@@ -60,10 +58,14 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
         }
         else
             view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
+            */
+        view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
+
 
         //Now time to initialize the buttons
         view.submit_report_button.setOnClickListener {
             if (reportString != null) {
+                /*
                 //Test to see if the user has never been reported! If not, initalize reported
                 //reasons map
                 if (reported_Account.reported_flags!!.reported_reasons == null)
@@ -91,7 +93,7 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
                                 .add(view.other_explaination.text.toString())
                     }
                 }
-
+                */
 
                 //Now Remove the Book So the User does not have to deal with an unwanted seller!!
                 if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){

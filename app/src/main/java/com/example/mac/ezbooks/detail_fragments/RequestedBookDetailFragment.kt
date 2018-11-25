@@ -1,6 +1,7 @@
 package com.example.mac.ezbooks.detail_fragments
 
 import android.arch.lifecycle.ViewModelProviders
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -9,15 +10,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.mac.ezbooks.R
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer
+import com.example.mac.ezbooks.ui.main.Searched_Textbooks
 import com.example.mac.ezbooks.ui.main.Textbooks
+import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.detail_requested_books_layout.view.*
 
 class RequestedBookDetailFragment : Fragment() {
     lateinit var image: ImageView
     private lateinit var booksViewModel: MainViewModel
-    private lateinit var textbook: Textbooks
+    private lateinit var textbook: Searched_Textbooks
     private var RECENTS_SIZE = 5
     private var MIN_SIZE = 0
 
@@ -29,13 +33,18 @@ class RequestedBookDetailFragment : Fragment() {
         } ?: throw Exception("Invalid Activity")
 
         //Set up information
-        view.detail_requested_book_title.text = booksViewModel.selected_requested.Title
+        view.detail_requested_book_title.text = booksViewModel.selected_requested.title
         view.detail_requested_book_isbn.text = booksViewModel.selected_requested.isbn
         view.detail_requested_book_course.text = booksViewModel.selected_requested.course
         view.detail_requested_book_instructor.text = booksViewModel.selected_requested.instructor
 
+        if(booksViewModel.selected_requested.book_img != null) {
+            var bitmap = BitmapFactory.decodeByteArray(booksViewModel.selected_requested.book_img,
+                    0, booksViewModel.selected_requested.book_img!!.size)
+            view.detail_requested_book_image.setImageBitmap(bitmap)
+        }
 
-        view.detail_requested_book_seller.text = booksViewModel.selected_requested.affiliated_account.user_name
+        view.detail_requested_book_seller.text = booksViewModel.selected_requested.user_name
 
         //First check to see if the selected list of buyers is null (it should not!!)
         var isAproved = false
@@ -48,8 +57,8 @@ class RequestedBookDetailFragment : Fragment() {
                 }
             }
             if(isAproved) {//If Id
-                view.detail_requested_book_phone_number.text = booksViewModel.selected_requested.affiliated_account.phone_number
-                view.detail_requested_book_email.text = booksViewModel.selected_requested.affiliated_account.email_address
+                view.detail_requested_book_phone_number.text = booksViewModel.selected_requested.user_phone
+                view.detail_requested_book_email.text = booksViewModel.selected_requested.user_email
             }else{
                 view.detail_requested_book_phone_number.text = "Not Authorized to View Information"
                 view.detail_requested_book_email.text = "Not Authorized to View Information"
@@ -64,6 +73,7 @@ class RequestedBookDetailFragment : Fragment() {
          //TODO: remove this referenced listing in the data base. Any connection made between this textbook and user should be removed
 
             //Update the home page view...Remove the book if it is found in the homepage recycler view, also adjust the view when removed
+            booksViewModel.recent_requested_Textbooks.clear()
             if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){
                 booksViewModel.recent_requested_Textbooks.remove(booksViewModel.selected_requested)
 
@@ -80,6 +90,8 @@ class RequestedBookDetailFragment : Fragment() {
                 }
             }
 
+            var databaseManager = FirebaseDatabaseManager()
+            databaseManager.removeRequest(booksViewModel, booksViewModel.selected_requested)
             val fragmentManager = activity?.supportFragmentManager
             fragmentManager?.popBackStack()
 

@@ -51,8 +51,15 @@
     <string name="remove">Remove</string>
     <string name="edit">Edit</string>
     <string name="users_who_want_to_buy">Users who want to purchase your book:</string>
-    <string name="create_account">Create Account</string>
     <string name="login">Login</string>
     <string name="account">useremail@calpoly.edu</string>
     <string name="account_name">account name here</string>
+    <string name="search_hint">Kotlin in Action</string>
+    <string name="password">password</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="email">email</string>
+    <string name="create_account">Create Account</string>
+
+
 </resources>

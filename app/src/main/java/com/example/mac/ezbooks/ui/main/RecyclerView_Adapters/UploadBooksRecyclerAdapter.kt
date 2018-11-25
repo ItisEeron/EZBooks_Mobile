@@ -40,7 +40,6 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
                 var position: Int = getAdapterPosition()
 
                 viewModel.selected_selling = viewModel.selling_textbooks[position]
-
                 fragment.activity?.supportFragmentManager?.beginTransaction()?.
                         setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
                         SellingBookDetailFragment())?.addToBackStack(null)?.commit()
@@ -60,7 +59,7 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
         if(fragment is HomeFragment) {
             viewHolder.itemTitle.text = viewModel.recent_selling_Textbooks[i].Title
             viewHolder.itemISBN.text = viewModel.recent_selling_Textbooks[i].isbn
-            viewHolder.itemAccount.text = viewModel.recent_selling_Textbooks[i].affiliated_account.user_name
+            viewHolder.itemAccount.text = viewModel.recent_selling_Textbooks[i].affiliated_account?.user_name
             if(viewModel.recent_selling_Textbooks[i].book_img != null){
                 var bitmap = BitmapFactory.
                         decodeByteArray(viewModel.recent_selling_Textbooks[i].book_img,
@@ -74,7 +73,7 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
         else{
             viewHolder.itemTitle.text = viewModel.selling_textbooks[i].Title
             viewHolder.itemISBN.text = viewModel.selling_textbooks[i].isbn
-            viewHolder.itemAccount.text = viewModel.selling_textbooks[i].affiliated_account.user_name
+            viewHolder.itemAccount.text = viewModel.selling_textbooks[i].affiliated_account?.user_name
             if(viewModel.selling_textbooks[i].book_img != null){
                 var bitmap = BitmapFactory.
                         decodeByteArray(viewModel.selling_textbooks[i].book_img,

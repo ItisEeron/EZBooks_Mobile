@@ -11,15 +11,16 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.io.Serializable
 
 
 class MainViewModel : ViewModel() {
     lateinit var selling_textbooks: MutableList<Textbooks>
     lateinit var selected_selling: Textbooks
     lateinit var user_account:UserAccount
-    lateinit var requested_textbooks: MutableList<Textbooks>
-    lateinit var selected_requested: Textbooks
-    lateinit var recent_requested_Textbooks: MutableList<Textbooks>
+    lateinit var requested_textbooks: MutableList<Searched_Textbooks>
+    lateinit var selected_requested: Searched_Textbooks
+    lateinit var recent_requested_Textbooks: MutableList<Searched_Textbooks>
     lateinit var recent_selling_Textbooks: MutableList<Textbooks>
     private val RECENTS_SIZE = 5
     private val databaseManager = FirebaseDatabaseManager()
@@ -54,151 +55,71 @@ class MainViewModel : ViewModel() {
     init{
         R_B_Page_List.addAll(OGlist)
         R_B_Home_List.addAll(R_B_Page_List.subList(0, RECENTS_SIZE))
-        getAllTextbooks()
     }
 
 
     /////////////////////////////////////////////////////////////////
 
-    fun getAllTextbooks() {
-       if (!::selling_textbooks.isInitialized) {
-            loadTextbookselling()
+    fun getAllTextbooks(user_id : String, user_name: String?, user_email: String?) {
+        if(!::user_account.isInitialized){
+            user_account =  UserAccount(user_id, null,user_name,
+                    user_email, null, "5/17/18",
+                    0, null, null)
+
+        }
+        if (!::selling_textbooks.isInitialized) {
+            selling_textbooks = mutableListOf()
+            recent_selling_Textbooks = mutableListOf()
         }
         if(!::requested_textbooks.isInitialized) {
-            loadTextbookbuying()
+            requested_textbooks = mutableListOf()
+            recent_requested_Textbooks = mutableListOf()
         }
-        if(!::user_account.isInitialized){
-            user_account =  UserAccount(null, null,null,
-                    null, null, "5/17/18",
-                    0, null, null)
-            //getUserAccount()
+        getUserAccount(user_id)
 
-        }
 
     }
 
-    private fun loadTextbookselling() {
+    private fun loadTextbookselling(fragment: Fragment) {
+        // Do an asynchronous operation to fetch users
+        databaseManager.retrieveSellingTextbookList(user_account.user_id!!,this, fragment)
+
+    }
+
+    private fun loadTextbookbuying(fragment: Fragment) {
         // Do an asynchronous operation to fetch users
         // This function will gather the data from the servers, however, we are using dummy data right now
-        // TODO: Get data from database; using fake data for now
-        selling_textbooks = mutableListOf()
-        selling_textbooks.addAll(listOf(
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), mutableListOf(Potential_Buyer(104955L, "Eeron Grant", true), Potential_Buyer(55005L, "Serena Grant", false),
-                        Potential_Buyer(55005L, "Serena Grant", false))),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), null),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)) , null),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)),mutableListOf(Potential_Buyer(104955L, "Eeron Grant", true))),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), mutableListOf(Potential_Buyer(104955L, "Eeron Grant", true))),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), null),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), null ),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), mutableListOf(Potential_Buyer(104955L, "Eeron Grant", true)))))
-
-        recent_selling_Textbooks = mutableListOf()
-        recent_selling_Textbooks.addAll(selling_textbooks.subList(0, RECENTS_SIZE))
-
-
-
-    }
-
-    private fun loadTextbookbuying() {
-        // Do an asynchronous operation to fetch users
-        // This function will gather the data from the servers, however, we are using dummy data right now
-        // TODO: Get data from database; using fake data for now
-        requested_textbooks = mutableListOf()
-        requested_textbooks.addAll(listOf(
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), mutableListOf(Potential_Buyer(104955L, "Eeron Grant", true))),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), null),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)) , null),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)),mutableListOf(Potential_Buyer(104955L, "Eeron Grant", true))),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), mutableListOf(Potential_Buyer(104955L, "Eeron Grant", true))),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), null),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), null ),
-                Textbooks("Of Mice and Men", "904585849", null,"Jeane Briggs",
-                        "English 101", UserAccount(104955L, null,"Eeron Grant",
-                        "eerongrant@gmail.com", "9255663812", "5/17/18",
-                        0, "Senior", Reports(0, null,
-                        null)), mutableListOf(Potential_Buyer(104955L, "Eeron Grant", false)))))
-
-        recent_requested_Textbooks = mutableListOf()
-        recent_requested_Textbooks.addAll(requested_textbooks.subList(0, RECENTS_SIZE))
+        databaseManager.retrieveRequestedTextbookList(user_account.user_id!!,this, fragment, null)
     }
 
 
-    fun getUserAccount(fragment: Fragment){
+    private fun getUserAccount(user_id : String){
         // Do an asynchronous operation to fetch user
         // TODO: Get data from database; using fake data for now
-        databaseManager.retrieveAccount(104955L, this, fragment)
+        databaseManager.retrieveAccount(user_id, this, null, null)
     }//getUserAccount
 }
 
 
 //TODO:CHECK WITH OTHER EZ-BOOKS MEMBERS TO MAKE SURE INFORMATION IS VALID!!
 //TODO: ADD A MUTABLE MAP IN TEXTBOOKS TO ALLOW THE SELLER TO CLEAR USERS TO VIEW THEIR INFORMATION
-data class Textbooks(var Title:String, var isbn:String, var book_img: ByteArray?, var instructor:String?, var course:String?,
-                     val affiliated_account:UserAccount, var potential_buyers: MutableList<Potential_Buyer>?)
-data class UserAccount(var user_id:Long?, var profile_img: ByteArray?, var user_name:String?, var email_address:String?,
+data class Textbooks( val book_id: Long, var Title:String, var isbn:String, var book_img: ByteArray?, var instructor:String?, var course:String?,
+                     var affiliated_account:UserAccount?, var potential_buyers: MutableList<Potential_Buyer>?)
+data class UserAccount(var user_id: String?, var profile_img: ByteArray?, var user_name:String?, var email_address:String?,
                     var phone_number:String?, val date_joined:String?, var account_status:Int,
                     var class_standing:String?, var reported_flags:Reports?)
 data class Reports(var num_of_flags:Int, var reported_reasons: MutableMap<String, Int>?,
                    var other_reason_log : ArrayList<String>?)
-data class Potential_Buyer(val account_id:Long, var account_name:String, var approved:Boolean)
+data class Potential_Buyer(val account_id:String, var account_name:String, var approved:Boolean)
+
+data class Searched_Textbooks(val userid : String?,
+                              val bookid : Long?,
+                              val user_name : String?,
+                              val user_email: String?,
+                              val user_phone: String?,
+                              val title : String?,
+                              val isbn : String?,
+                              val course : String?,
+                              val instructor : String?,
+                              val book_img : ByteArray?,
+                              var potential_buyers: MutableList<Potential_Buyer>?) : Serializable

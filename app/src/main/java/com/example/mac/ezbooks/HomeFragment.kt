@@ -5,16 +5,28 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentTransaction
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.*
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.R_B_RecyclerAdapter
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.UploadBooksRecyclerAdapter
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.home_fragment.view.*
+import android.app.Activity
+
+
 //import kotlinx.android.synthetic.main.item_row.view.*
 
 
@@ -39,7 +51,6 @@ class HomeFragment : Fragment() {
     private lateinit var uploadedBooksadapter: RecyclerView.Adapter<UploadBooksRecyclerAdapter.ViewHolder>
     private lateinit var uploadedBooksRecyclerview : RecyclerView
 
-
     override fun onCreate(savedInstanceState : Bundle?) {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
@@ -50,7 +61,13 @@ class HomeFragment : Fragment() {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
 
-        booksViewModel.getUserAccount(this)
+        //booksViewModel.getAllTextbooks(this)
+
+
+        //databaseManager.retrieveRequestedTextbookList(104955L, booksViewModel, this, null)
+        //databaseManager.retrieveSellingTextbookList(104955L, booksViewModel, this)
+
+
 
     }
 
@@ -124,6 +141,6 @@ class HomeFragment : Fragment() {
         uploadedBookslayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         uploadedBooksRecyclerview.layoutManager = uploadedBookslayoutManager
 
-
     }
+
 }

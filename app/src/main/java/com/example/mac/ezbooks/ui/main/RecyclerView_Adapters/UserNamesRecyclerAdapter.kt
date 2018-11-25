@@ -14,19 +14,27 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.detail_fragments.ReportUserFragment
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer
+import com.example.mac.ezbooks.ui.main.Searched_Textbooks
+import com.example.mac.ezbooks.ui.main.Textbooks
 import kotlinx.android.synthetic.main.other_users_card_layout.view.*
 
-class UserNamesRecyclerAdapter(val fragment: Fragment, private val booksViewModel: MainViewModel) :  RecyclerView.Adapter<UserNamesRecyclerAdapter.ViewHolder>() {
+class UserNamesRecyclerAdapter(val fragment: Fragment, private val booksViewModel: MainViewModel, textbooks : Textbooks) :  RecyclerView.Adapter<UserNamesRecyclerAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var nameView: TextView
         var buyerList : MutableList<Potential_Buyer>?
-
+        var sText : Searched_Textbooks
+        var databaseManager = FirebaseDatabaseManager()
         init {
             nameView = itemView.findViewById(R.id.buyer_name)
-
+            var textbook = booksViewModel.selected_selling
+            sText = Searched_Textbooks(booksViewModel.user_account.user_id, textbook.book_id,
+                    booksViewModel.user_account.user_name, textbook.affiliated_account?.email_address,
+                    textbook.affiliated_account?.phone_number, textbook.Title, textbook.isbn,
+                    textbook.course, textbook.instructor, textbook.book_img, textbook.potential_buyers)
             buyerList = booksViewModel.selected_selling.potential_buyers
 
 
@@ -43,12 +51,15 @@ class UserNamesRecyclerAdapter(val fragment: Fragment, private val booksViewMode
                    buyerList!![position].approved = true
                    itemView.card_view.setCardBackgroundColor(Color.GREEN)
                }
+                databaseManager.toggleRequestApproval(booksViewModel, sText, buyerList!![position].approved, buyerList!![position])
 
             }
+
             //Long Click to Remove user
-            //TODO: THIS CRASHES FOR SOME REASON
             itemView.setOnLongClickListener{view ->
                 var position: Int = getAdapterPosition()
+
+                databaseManager.removeOtherUser(booksViewModel, sText, buyerList!![position])
                 buyerList!!.removeAt(position)
 
                 //Upadtes the recycler view!!!!

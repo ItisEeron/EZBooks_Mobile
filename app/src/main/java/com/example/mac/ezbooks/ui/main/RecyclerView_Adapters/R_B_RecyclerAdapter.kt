@@ -55,9 +55,9 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
     override fun onBindViewHolder(viewHolder: ViewHolder, i: Int) {
         //TODO: ADD CONDITIONS FOR SELLING TEXTBOOKS AS WELL
         if(fragment is HomeFragment) {
-            viewHolder.itemTitle.text = viewModel.recent_requested_Textbooks[i].Title
+            viewHolder.itemTitle.text = viewModel.recent_requested_Textbooks[i].title
             viewHolder.itemISBN.text = viewModel.recent_requested_Textbooks[i].isbn
-            viewHolder.itemAccount.text = viewModel.recent_requested_Textbooks[i].affiliated_account.user_name
+            viewHolder.itemAccount.text = viewModel.recent_requested_Textbooks[i].user_name
             if(viewModel.recent_requested_Textbooks[i].book_img != null){
                 var bitmap = BitmapFactory.
                         decodeByteArray(viewModel.recent_requested_Textbooks[i].book_img,
@@ -69,9 +69,9 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
             }
         }
         else{
-            viewHolder.itemTitle.text = viewModel.requested_textbooks[i].Title
+            viewHolder.itemTitle.text = viewModel.requested_textbooks[i].title
             viewHolder.itemISBN.text = viewModel.requested_textbooks[i].isbn
-            viewHolder.itemAccount.text = viewModel.requested_textbooks[i].affiliated_account.user_name
+            viewHolder.itemAccount.text = viewModel.requested_textbooks[i].user_name
             if(viewModel.requested_textbooks[i].book_img != null){
                 var bitmap = BitmapFactory.
                         decodeByteArray(viewModel.requested_textbooks[i].book_img,
