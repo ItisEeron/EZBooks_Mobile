@@ -10,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.UserAccount
 import kotlinx.android.synthetic.main.report_user_layout.*
@@ -22,6 +23,7 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private lateinit var reportString : String
     private lateinit var booksViewModel : MainViewModel
     private lateinit var reported_Account : UserAccount
+    private var firebaseDatabaseManager = FirebaseDatabaseManager()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.report_user_layout, container, false)
@@ -106,7 +108,7 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 booksViewModel.requested_textbooks.remove(booksViewModel.selected_requested)
 
                 Toast.makeText(activity,
-                        "You have reported " + reported_Account.user_name + ".",
+                        "You have reported " + booksViewModel.selected_requested.user_name + ".",
                         Toast.LENGTH_LONG).show()
 
                 fragmentManager?.popBackStack()
@@ -116,7 +118,7 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
             else{
                 Toast.makeText(activity,
                         "Please choose a reason why you are reporting " +
-                                reported_Account.user_name +"." , Toast.LENGTH_LONG).show()}
+                                booksViewModel.selected_requested.user_name +"." , Toast.LENGTH_LONG).show()}
         }
 
         view.cancel_report_button.setOnClickListener{

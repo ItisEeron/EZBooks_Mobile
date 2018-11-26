@@ -4,16 +4,9 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.annotation.NonNull
 import android.text.TextUtils
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Toast
-import com.example.mac.ezbooks.R.styleable.View
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
+import android.widget.*
+import com.example.mac.ezbooks.loginAccount.ChangePasswordActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
@@ -24,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var progressBar : ProgressDialog
     private lateinit var btnSignup : Button
     private lateinit var btnLogin : Button
-    //private lateinit var btnReset: Button
+    private lateinit var txtPassReset: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
         inputPassword =  findViewById(R.id.login_user_password)
         btnSignup = findViewById(R.id.create_account_button)
         btnLogin = findViewById(R.id.login_button)
-        //btnReset = (Button) findViewById(R.id.btn_reset_password)
+        txtPassReset= findViewById(R.id.tv_forgot_password)
 
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance()
@@ -58,14 +51,10 @@ class LoginActivity : AppCompatActivity() {
 
         }
 
-        /*
-         btnReset.setOnClickListener(new View.OnClickListener() {
-         @Override
-          public void onClick(View v) {
-          startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+
+         txtPassReset.setOnClickListener{
+             startActivity(Intent(this@LoginActivity, ChangePasswordActivity::class.java))
          }
-         });
-        */
 
         btnLogin.setOnClickListener{
             var email = inputEmail.text.toString()

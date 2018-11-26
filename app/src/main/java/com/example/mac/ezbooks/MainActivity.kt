@@ -1,28 +1,25 @@
 package com.example.mac.ezbooks
 
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.DrawerLayout.DrawerListener
 import android.support.v7.app.ActionBar
 import android.support.v7.widget.Toolbar
-import android.util.AttributeSet
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
-import com.example.mac.ezbooks.loginAccount.ChangePassword
-import com.example.mac.ezbooks.loginAccount.LoginFragment
+import com.example.mac.ezbooks.loginAccount.ChangePasswordActivity
+import com.example.mac.ezbooks.loginAccount.ChangePasswordFragment
 import com.example.mac.ezbooks.loginAccount.VerifyAccount
 import com.example.mac.ezbooks.ui.main.*
 import com.google.firebase.auth.FirebaseAuth
@@ -72,7 +69,7 @@ class MainActivity : AppCompatActivity()  {
     private lateinit var mainDrawerLayout: DrawerLayout
     private lateinit var booksViewModel: MainViewModel
     private lateinit var databaseManager: FirebaseDatabaseManager
-
+    private lateinit var navigationView : NavigationView
     private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +87,7 @@ class MainActivity : AppCompatActivity()  {
         booksViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         booksViewModel.getAllTextbooks(mUser!!.uid, mUser!!.displayName, mUser!!.email)
         //Now time to initialize the navigation click events, will not present anything!!!!
-        val navigationView : NavigationView = nav_view
+        navigationView = nav_view
         //Sets up the navigation menu from main Drawer
         navigationView.setNavigationItemSelectedListener { menuItem ->
             menuItem.isChecked = true
@@ -131,14 +128,6 @@ class MainActivity : AppCompatActivity()  {
                 }
         )
 
-        //Sets Up the Home page as the default fragment
-        /*if (savedInstanceState == null) {
-            //Defaults home item to checked!!!
-            var menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
-            navigationView.setCheckedItem(menuItem)
-            onNavigationItemSelected(menuItem)
-        }
-        */
         search_Textbook_fab.setOnClickListener {
             var menuItem = navigationView.menu.getItem(0).subMenu.getItem(4)
             navigationView.setCheckedItem(menuItem)
@@ -328,6 +317,46 @@ class MainActivity : AppCompatActivity()  {
 
         })
 
+    //Keeps the navigation drawer in the correct placement when back is pressed
+    supportFragmentManager.addOnBackStackChangedListener {
+        var fragment = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount -1).name
+        when (fragment){
+            "homeFrag"->{
+                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
+                navigationView.setCheckedItem(menuItem)
+            }
+            "uploadBook"->{
+                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(1)
+                navigationView.setCheckedItem(menuItem)
+            }
+            "requestedBooks"->{
+                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(2)
+                navigationView.setCheckedItem(menuItem)
+            }
+            "booksforSale"->{
+                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(3)
+                navigationView.setCheckedItem(menuItem)
+            }
+            "searchShop"->{
+                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(4)
+                navigationView.setCheckedItem(menuItem)
+            }
+            "editAccount"->{
+                var menuItem = navigationView.menu.getItem(1).subMenu.getItem(0)
+                navigationView.setCheckedItem(menuItem)
+            }
+            "verifyAccount"->{
+                var menuItem = navigationView.menu.getItem(1).subMenu.getItem(1)
+                navigationView.setCheckedItem(menuItem)
+            }
+            "changePassword"->{
+                var menuItem = navigationView.menu.getItem(1).subMenu.getItem(2)
+                navigationView.setCheckedItem(menuItem)
+            }
+        }
+
+    }
+
 
     }//onCreate
 
@@ -344,24 +373,15 @@ class MainActivity : AppCompatActivity()  {
 
     //This function will display the different screens stemming from the main activity
     fun displayScreen(id: Int) {
-        //TODO: ADD MORE TO THE displayScreen function
 
-        //This pops all fragments for a clean navigation from the home!!!
-        var fragEntryCount = supportFragmentManager.backStackEntryCount
-        while(fragEntryCount > 1) {
-            supportFragmentManager.popBackStack()
-            fragEntryCount--
-        }
-
-
-        val fragment = when (id) {
+       when (id) {
 
             R.id.nav_edit_credentials->{
                 supportFragmentManager.beginTransaction().
                         setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
                                 R.anim.abc_fade_in,R.anim.abc_fade_out).
                         replace(R.id.flContent,
-                        EditAccountFragment()).addToBackStack("editAccout").commit()
+                        EditAccountFragment()).addToBackStack("editAccount").commit()
             }
             R.id.nav_add_listing->{
                 supportFragmentManager.beginTransaction().
@@ -398,7 +418,7 @@ class MainActivity : AppCompatActivity()  {
                         setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
                                 R.anim.abc_fade_in,R.anim.abc_fade_out).
                         replace(R.id.flContent,
-                                ChangePassword()).addToBackStack("changePassword").commit()
+                                ChangePasswordFragment()).addToBackStack("changePassword").commit()
             }
             R.id.nav_verify_account->{
                 supportFragmentManager.beginTransaction().

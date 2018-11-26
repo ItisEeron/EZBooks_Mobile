@@ -36,6 +36,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".CreateAccountActivity"></activity>
+        <activity android:name=".loginAccount.ChangePasswordActivity"></activity>
+
     </application>
 
 </manifest>

@@ -143,7 +143,7 @@ class FirebaseDatabaseManager (){
 
     }
 
-    fun retrieveRequestedTextbookList(user_id: String,viewModel: MainViewModel, fragment:Fragment?, recyclerAdapter: RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>?){
+    fun retrieveRequestedTextbookList(user_id: String,viewModel: MainViewModel, fragment:Fragment?){
         var myRef = database.getReference(KEY_ACCOUNT)
                 .child(user_id).child(KEY_REQ_BOOKS)
 
@@ -437,41 +437,9 @@ class FirebaseDatabaseManager (){
 
     }
 
-    fun listenForRequestUpdate(viewModel: MainViewModel, textbook: Searched_Textbooks){
-        var myRef = database.getReference(KEY_TEXTBOOK_REF)
-                .child(textbook.userid.toString() + textbook.bookid.toString())
-                .child(KEY_POTENTIAL_BUYERS)
-
-        myRef.addChildEventListener(object: ChildEventListener{
-            override fun onCancelled(p0: DatabaseError) {
-                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                var buyerName = p0.child(KEY_BUYER_NAME).value as String
-                var buyerID = p0.child(KEY_BUYER_ID).value as String
-                var buyerApproval = p0.child(KEY_BUYER_APPROVAL).value as Boolean
-
-
-                var newBuyer = Potential_Buyer(buyerID, buyerName, buyerApproval)
-                textbook.potential_buyers?.add(newBuyer)
-
-            }
-
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-
-            }
-
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-               // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        })
-
-
+    fun reportUser(){
+        var myRef = database.getReference(KEY_ACCOUNT).child(viewModel.user_account.user_id!!).child(KEY_TEXTBOOK)
+                .child(textbook.bookid.toString()).child(KEY_POTENTIAL_BUYERS)
+                .child(buyer.account_id).child(KEY_BUYER_APPROVAL)
     }
 }
