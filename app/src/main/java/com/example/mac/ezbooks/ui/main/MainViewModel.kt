@@ -39,7 +39,7 @@ class MainViewModel : ViewModel() {
     private fun getUserAccount(user_id : String){
         // Do an asynchronous operation to fetch user
         // TODO: Get data from database; using fake data for now
-        databaseManager.retrieveAccount(user_id, this, null, null)
+        databaseManager.retrieveAccount(user_id, this)
     }//getUserAccount
 }
 

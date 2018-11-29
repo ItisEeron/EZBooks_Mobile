@@ -21,12 +21,12 @@ import java.util.*
 
 
 class ImageHandler {
-    val REQUEST_TAKE_PHOTO = 1
+    private val REQUEST_TAKE_PHOTO = 1
 
     fun dispatchTakePictureIntent(fragment: Fragment, activity: FragmentActivity, mCurrentPhotoPath: String) {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
-            takePictureIntent.resolveActivity(activity!!.packageManager)?.also {
+            takePictureIntent.resolveActivity(activity.packageManager)?.also {
                 // Create the File where the photo should go
                 val photoFile: File? = try {
                     createImageFile(mCurrentPhotoPath, activity)
@@ -57,7 +57,7 @@ class ImageHandler {
         Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
             val f = File(mCurrentPhotoPath)
             mediaScanIntent.data = Uri.fromFile(f)
-            activity?.sendBroadcast(mediaScanIntent)
+            activity.sendBroadcast(mediaScanIntent)
         }
 
     }
@@ -83,7 +83,7 @@ class ImageHandler {
         }
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)?.also { bitmap ->
             the_image.setImageBitmap(bitmap)
-            var stream = ByteArrayOutputStream()
+            val stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             pendingUpload = stream.toByteArray()
         }
@@ -95,7 +95,7 @@ class ImageHandler {
     fun createImageFile(mCurrentPhotoPath: String, activity: Activity): File {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? = activity!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val storageDir: File? = activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
                 "JPEG_${timeStamp}_", /* prefix */
                 ".jpg", /* suffix */

@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -44,13 +43,9 @@ class MainActivity : AppCompatActivity()  {
     private val KEY_ACCOUNT = "account"
     private val KEY_TEXTBOOK_REF = "textbook_ref"
     private val KEY_TEXTBOOK = "textbook"
-    private val KEY_REPORTS = "reports"
-    private val KEY_CLASS = "class_standing"
     private val KEY_EMAIL = "email"
     private val KEY_NAME = "name"
-    private val KEY_ID = "id"
     private val KEY_PHONE = "phone_number"
-    private val KEY_PROF = "profile_img"
     private val KEY_REQ_BOOKS = "req_books"
 
     private val KEY_BOOK_ID = "book_id"
@@ -85,7 +80,7 @@ class MainActivity : AppCompatActivity()  {
 
         //Sets up very first viewModel for all fragments to reference
         booksViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        booksViewModel.getAllTextbooks(mUser!!.uid, mUser!!.displayName, mUser!!.email)
+        booksViewModel.getAllTextbooks(mUser!!.uid, mUser.displayName, mUser.email)
         //Now time to initialize the navigation click events, will not present anything!!!!
         navigationView = nav_view
         //Sets up the navigation menu from main Drawer
@@ -129,7 +124,7 @@ class MainActivity : AppCompatActivity()  {
         )
 
         search_Textbook_fab.setOnClickListener {
-            var menuItem = navigationView.menu.getItem(0).subMenu.getItem(4)
+            val menuItem = navigationView.menu.getItem(0).subMenu.getItem(4)
             navigationView.setCheckedItem(menuItem)
             onNavigationItemSelected(menuItem)
         }
@@ -138,7 +133,7 @@ class MainActivity : AppCompatActivity()  {
 
         //Testing Database info
        //databaseManager.retrieveRequestedTextbookList(104955L, booksViewModel, null, null)
-        var myRef1 = database.getReference(KEY_ACCOUNT)
+        val myRef1 = database.getReference(KEY_ACCOUNT)
                 .child(mUser.uid).child(KEY_REQ_BOOKS)
 
         myRef1.addValueEventListener(object : ValueEventListener {
@@ -146,12 +141,12 @@ class MainActivity : AppCompatActivity()  {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                var requested_book_ids : ArrayList<String> = arrayListOf()
-                var id_iter = snapshot.children
+                val requested_book_ids : ArrayList<String> = arrayListOf()
+                val id_iter = snapshot.children
                 for (textbook in id_iter){
                     requested_book_ids.add(textbook.key!!)
                 }
-                var newRef = database.getReference(KEY_TEXTBOOK_REF)
+                val newRef = database.getReference(KEY_TEXTBOOK_REF)
                 newRef.addListenerForSingleValueEvent(object : ValueEventListener{
                     override fun onCancelled(p0: DatabaseError) {
                     }
@@ -159,7 +154,7 @@ class MainActivity : AppCompatActivity()  {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         booksViewModel.recent_requested_Textbooks.clear()
                         booksViewModel.requested_textbooks.clear()
-                        var textbook_iter = snapshot.children
+                        val textbook_iter = snapshot.children
                         for(textbook in textbook_iter){
                             if(requested_book_ids.contains(textbook.key)){
                                 val userid = textbook.child(KEY_ACCOUNT).value.toString()
@@ -171,7 +166,7 @@ class MainActivity : AppCompatActivity()  {
                                 val instructor = textbook.child(KEY_INSTRUCTOR).getValue(String::class.java)
                                 val user_email = textbook.child(KEY_EMAIL).getValue(String::class.java)
                                 val user_phone = textbook.child(KEY_PHONE).getValue(String::class.java)
-                                var potential_Buyer : MutableList<Potential_Buyer> = mutableListOf()
+                                val potential_Buyer : MutableList<Potential_Buyer> = mutableListOf()
                                 val book_img_string = textbook.child(KEY_BOOK_IMG).getValue(String::class.java)
                                 var book_img : ByteArray? = null
                                 if(book_img_string != null){
@@ -183,13 +178,13 @@ class MainActivity : AppCompatActivity()  {
                                     if(buyer != null) {
                                         var buyerName: String?
                                         var buyerID: String?
-                                        var buyerApproval: Boolean = false
+                                        var buyerApproval: Boolean
 
                                         buyerID = buyer.child(KEY_BUYER_ID).value.toString()
                                         buyerName = buyer.child(KEY_BUYER_NAME).value as String
                                         buyerApproval = buyer.child(KEY_BUYER_APPROVAL).value as Boolean
 
-                                        potential_Buyer.add(Potential_Buyer(buyerID!!, buyerName!!, buyerApproval!!))
+                                        potential_Buyer.add(Potential_Buyer(buyerID, buyerName, buyerApproval))
                                     }
                                 }
                                 booksViewModel.requested_textbooks.add(Searched_Textbooks(userid, bookid, user_name, user_email, user_phone,title, isbn,
@@ -209,15 +204,15 @@ class MainActivity : AppCompatActivity()  {
                         }
 
                         if(supportFragmentManager.findFragmentById(R.id.flContent) == null) {
-                            var menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
+                            val menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
                             navigationView.setCheckedItem(menuItem)
                             onNavigationItemSelected(menuItem)
                         } else{
 
-                            var fragment = supportFragmentManager.findFragmentById(R.id.flContent)
-                            var ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+                            val fragment = supportFragmentManager.findFragmentById(R.id.flContent)
+                            val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
                             ft.detach(fragment!!)
-                            ft.attach(fragment!!)
+                            ft.attach(fragment)
                             ft.commit()
                         }
 
@@ -227,8 +222,7 @@ class MainActivity : AppCompatActivity()  {
             }
         })
 
-       //databaseManager.retrieveSellingTextbookList(104955L, booksViewModel, null)
-        var myRef2 = database.getReference(KEY_ACCOUNT)
+        val myRef2 = database.getReference(KEY_ACCOUNT)
                 .child(mUser.uid).child(KEY_TEXTBOOK)
         myRef2.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -236,82 +230,67 @@ class MainActivity : AppCompatActivity()  {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot != null){
-                    booksViewModel.recent_selling_Textbooks.clear()
-                    booksViewModel.selling_textbooks.clear()
-                    val textbook_snap = snapshot.children
-                    var iter = textbook_snap.iterator()
+                booksViewModel.recent_selling_Textbooks.clear()
+                booksViewModel.selling_textbooks.clear()
+                val textbook_snap = snapshot.children
+                val iter = textbook_snap.iterator()
 
-                    for (item in iter) {
-                        //val textbooks = item.children
-                        //var textbookIter = textbooks.iterator()
-                        //for(textbook in textbookIter) {
-                        var potential_buyers : MutableList<Potential_Buyer>? = mutableListOf()
-                        println("Eeron ${item}")
-                        //val userid = item.child(KEY_ACCOUNT).value as Long
-                        val bookid = item.child(KEY_BOOK_ID).value as Long
-                        //val user_name = item.child(KEY_NAME).getValue(String::class.java)
-                        val title = item.child(KEY_TITLE).getValue(String::class.java)
-                        val isbn = item.child(KEY_ISBN).getValue(String::class.java)
-                        val course = item.child(KEY_COURSE).getValue(String::class.java)
-                        val instructor = item.child(KEY_INSTRUCTOR).getValue(String::class.java)
-                        val book_img_string = item.child(KEY_BOOK_IMG).getValue(String::class.java)
+                for (item in iter) {
+                    val potential_buyers : MutableList<Potential_Buyer>? = mutableListOf()
+                    println("Eeron ${item}")
+                    val bookid = item.child(KEY_BOOK_ID).value as Long
+                    val title = item.child(KEY_TITLE).getValue(String::class.java)
+                    val isbn = item.child(KEY_ISBN).getValue(String::class.java)
+                    val course = item.child(KEY_COURSE).getValue(String::class.java)
+                    val instructor = item.child(KEY_INSTRUCTOR).getValue(String::class.java)
+                    val book_img_string = item.child(KEY_BOOK_IMG).getValue(String::class.java)
 
-                        var book_img : ByteArray? = null
-                        if (book_img_string != null) {
-                            book_img = Base64.decode(book_img_string, Base64.DEFAULT)
-                        }
-                        //val user_email = textbook.child(KEY_EMAIL).getValue(String::class.java)
-                        //val user_phone = textbook.child(KEY_PHONE).getValue(String::class.java)
-
-                        val buyers_iter = item.child(KEY_POTENTIAL_BUYERS).children
-                        for (buyer in buyers_iter) {
-                            if(buyer != null) {
-                                var buyerName: Any?
-                                var buyerID: Any?
-                                var buyerApproval: Boolean = false
-
-                                buyerID = buyer.child(KEY_BUYER_ID).value
-                                buyerName = buyer.child(KEY_BUYER_NAME).value
-                                buyerApproval = buyer.child(KEY_BUYER_APPROVAL).value as Boolean
-
-                                if(buyerID != null && buyerName != null) {
-                                    potential_buyers?.add(Potential_Buyer(buyerID.toString(), buyerName.toString(), buyerApproval!!))
-                                }
+                    var book_img : ByteArray? = null
+                    if (book_img_string != null) {
+                        book_img = Base64.decode(book_img_string, Base64.DEFAULT)
+                    }
+                    val buyers_iter = item.child(KEY_POTENTIAL_BUYERS).children
+                    for (buyer in buyers_iter) {
+                        if(buyer != null) {
+                            var buyerName: Any?
+                            var buyerID: Any?
+                            var buyerApproval: Boolean
+                            buyerID = buyer.child(KEY_BUYER_ID).value
+                            buyerName = buyer.child(KEY_BUYER_NAME).value
+                            buyerApproval = buyer.child(KEY_BUYER_APPROVAL).value as Boolean
+                            if(buyerID != null && buyerName != null) {
+                                potential_buyers?.add(Potential_Buyer(buyerID.toString(), buyerName.toString(), buyerApproval))
                             }
                         }
-                        var aTextbook : Textbooks? = null
-                        if(bookid != null && title != null && isbn != null){
-                            aTextbook = Textbooks( bookid, title!!, isbn!!, book_img, instructor, course,
-                                    booksViewModel.user_account, potential_buyers)
-                            booksViewModel.selling_textbooks.add(aTextbook)
-                        }
-                        //}
-                    }//for
-
-                    booksViewModel.selling_textbooks.reverse()
-
-                    if(booksViewModel.selling_textbooks.size > 5) {
-                        booksViewModel.recent_selling_Textbooks.addAll(booksViewModel.selling_textbooks
-                                .subList(0, 5))
-                    }
-                    else {
-                        booksViewModel.recent_selling_Textbooks.addAll(booksViewModel.selling_textbooks)
                     }
 
-                    if(supportFragmentManager.findFragmentById(R.id.flContent) == null) {
-                        var menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
-                        navigationView.setCheckedItem(menuItem)
-                        onNavigationItemSelected(menuItem)
-                    } else{
-
-                        var fragment = supportFragmentManager.findFragmentById(R.id.flContent)
-                        var ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-                        ft.detach(fragment!!)
-                        ft.attach(fragment!!)
-                        ft.commit()
+                    var aTextbook : Textbooks?
+                    if(title != null && isbn != null){
+                        aTextbook = Textbooks( bookid, title, isbn, book_img, instructor, course,
+                                booksViewModel.user_account, potential_buyers)
+                        booksViewModel.selling_textbooks.add(aTextbook)
                     }
+                }//for
 
+                booksViewModel.selling_textbooks.reverse()
+                if(booksViewModel.selling_textbooks.size > 5) {
+                    booksViewModel.recent_selling_Textbooks.addAll(booksViewModel.selling_textbooks
+                            .subList(0, 5))
+                }
+                else {
+                    booksViewModel.recent_selling_Textbooks.addAll(booksViewModel.selling_textbooks)
+                }
+
+                if(supportFragmentManager.findFragmentById(R.id.flContent) == null) {
+                    val menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
+                    navigationView.setCheckedItem(menuItem)
+                    onNavigationItemSelected(menuItem)
+                } else{
+                    val fragment = supportFragmentManager.findFragmentById(R.id.flContent)
+                    val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+                    ft.detach(fragment!!)
+                    ft.attach(fragment)
+                    ft.commit()
                 }
             }
 
@@ -319,41 +298,41 @@ class MainActivity : AppCompatActivity()  {
 
     //Keeps the navigation drawer in the correct placement when back is pressed
     supportFragmentManager.addOnBackStackChangedListener {
-        var fragment = " "
-        if (supportFragmentManager.backStackEntryCount > 0)
-            fragment = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount -1).name!!
-
+        var fragment : String? = " "
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            fragment = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount - 1).name
+        }
         when (fragment){
             "homeFrag"->{
-                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
+                val menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
                 navigationView.setCheckedItem(menuItem)
             }
             "uploadBook"->{
-                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(1)
+                val menuItem = navigationView.menu.getItem(0).subMenu.getItem(1)
                 navigationView.setCheckedItem(menuItem)
             }
             "requestedBooks"->{
-                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(2)
+                val menuItem = navigationView.menu.getItem(0).subMenu.getItem(2)
                 navigationView.setCheckedItem(menuItem)
             }
             "booksforSale"->{
-                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(3)
+                val menuItem = navigationView.menu.getItem(0).subMenu.getItem(3)
                 navigationView.setCheckedItem(menuItem)
             }
             "searchShop"->{
-                var menuItem = navigationView.menu.getItem(0).subMenu.getItem(4)
+                val menuItem = navigationView.menu.getItem(0).subMenu.getItem(4)
                 navigationView.setCheckedItem(menuItem)
             }
             "editAccount"->{
-                var menuItem = navigationView.menu.getItem(1).subMenu.getItem(0)
+                val menuItem = navigationView.menu.getItem(1).subMenu.getItem(0)
                 navigationView.setCheckedItem(menuItem)
             }
             "verifyAccount"->{
-                var menuItem = navigationView.menu.getItem(1).subMenu.getItem(1)
+                val menuItem = navigationView.menu.getItem(1).subMenu.getItem(1)
                 navigationView.setCheckedItem(menuItem)
             }
             "changePassword"->{
-                var menuItem = navigationView.menu.getItem(1).subMenu.getItem(2)
+                val menuItem = navigationView.menu.getItem(1).subMenu.getItem(2)
                 navigationView.setCheckedItem(menuItem)
             }
         }
@@ -438,12 +417,7 @@ class MainActivity : AppCompatActivity()  {
             }
             R.id.nav_sign_out->{
                 FirebaseAuth.getInstance().signOut()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    this.finishAffinity()
-                }
-                else{
-                    ActivityCompat.finishAffinity(this)
-                }
+                ActivityCompat.finishAffinity(this)
                 val intent = Intent(this@MainActivity, LoginActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(intent)
@@ -495,8 +469,6 @@ class MainActivity : AppCompatActivity()  {
             }
 
         }
-
-        //displayScreen(item.itemId)
         mainDrawerLayout.closeDrawer(GravityCompat.START)
         return true
     }

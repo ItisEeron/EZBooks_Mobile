@@ -41,7 +41,7 @@ class FirebaseDatabaseManager (){
 
 
     fun createUser(id: String, name: String, email: String) {
-        var myRef = database.getReference(KEY_ACCOUNT)
+        val myRef = database.getReference(KEY_ACCOUNT)
         myRef.child(id).child(KEY_ID).setValue(id)
         myRef.child(id).child(KEY_NAME).setValue(name)
         myRef.child(id).child(KEY_EMAIL).setValue(email)
@@ -83,7 +83,7 @@ class FirebaseDatabaseManager (){
     }
 
     fun updateAccount(account : UserAccount){
-        var myRef = database.getReference(KEY_ACCOUNT)
+        val myRef = database.getReference(KEY_ACCOUNT)
         myRef.child(account.user_id.toString())
                 .child(KEY_NAME).setValue(account.user_name)
         myRef.child(account.user_id.toString())
@@ -95,7 +95,7 @@ class FirebaseDatabaseManager (){
 
         //convert profile_image into something readable by firebase
         if(account.profile_img != null ) {
-            var prof_image = Base64.encodeToString(account.profile_img, Base64.NO_WRAP)
+            val prof_image = Base64.encodeToString(account.profile_img, Base64.NO_WRAP)
             myRef.child(account.user_id.toString())
                     .child(KEY_PROF).setValue(prof_image)
         }
@@ -111,8 +111,8 @@ class FirebaseDatabaseManager (){
     }
 
     //Read from database
-    fun retrieveAccount(id : String , viewModel: MainViewModel, fragment: Fragment?, textbook :Textbooks?){
-        var myRef = database.getReference(KEY_ACCOUNT)
+    fun retrieveAccount(id : String , viewModel: MainViewModel){
+        val myRef = database.getReference(KEY_ACCOUNT)
         myRef.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 println(p0.message)
@@ -126,6 +126,7 @@ class FirebaseDatabaseManager (){
 
     }
 
+    /*
     fun retrieveRequestedTextbookList(user_id: String,viewModel: MainViewModel, fragment:Fragment?){
         var myRef = database.getReference(KEY_ACCOUNT)
                 .child(user_id).child(KEY_REQ_BOOKS)
@@ -298,6 +299,7 @@ class FirebaseDatabaseManager (){
 
         })
     }
+*/
 
     fun sendRequest(user_name: String, user_id : String ,owner_id : String , book_id : Long){
         var myRef = database.getReference(KEY_TEXTBOOK_REF).child((owner_id + book_id.toString()))
@@ -327,8 +329,8 @@ class FirebaseDatabaseManager (){
     }
 
     fun inputAccount (snapshot: DataSnapshot, viewModel: MainViewModel, textbook: Textbooks?){
-        val accounts = snapshot?.children
-        var iter = accounts.iterator()
+        val accounts = snapshot.children
+        val iter = accounts.iterator()
         var id: String? = null
         var name: String? = null
         var phone_number: String? = null
@@ -355,12 +357,12 @@ class FirebaseDatabaseManager (){
                     name = item.value as String
                 }
                 KEY_PROF -> {
-                    var prof_img_string = item.value.toString()
-                    if(prof_img_string != null && prof_img_string.isNotEmpty())
+                    val prof_img_string = item.value.toString()
+                    if(prof_img_string.isNotEmpty())
                         prof_img = Base64.decode(prof_img_string, Base64.DEFAULT)
                 }
                 KEY_REPORTS -> {
-                    var reports = item.children
+                    val reports = item.children
                     for(report in reports){
                         if(report.key != "others_log"){
                             reported_flags = reported_flags + report.value.toString().toLong()
@@ -399,7 +401,7 @@ class FirebaseDatabaseManager (){
 
     }
 
-    fun removeOtherUser(viewModel: MainViewModel, textbook: Searched_Textbooks, removed : Potential_Buyer){
+    fun removeOtherUser(textbook: Searched_Textbooks, removed : Potential_Buyer){
         var myRef = database.getReference(KEY_ACCOUNT).child(textbook.userid!!).child(KEY_TEXTBOOK)
                 .child(textbook.bookid.toString()).child(KEY_POTENTIAL_BUYERS)
                 .child(removed.account_id)
@@ -431,7 +433,7 @@ class FirebaseDatabaseManager (){
     }
 
     fun reportUser(viewModel: MainViewModel, report : String, other_reason : String?){
-        var myRef = database.getReference(KEY_ACCOUNT).child(viewModel.selected_requested.userid!!)
+        val myRef = database.getReference(KEY_ACCOUNT).child(viewModel.selected_requested.userid!!)
                 .child(KEY_REPORTS).child(report)
         myRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
@@ -456,17 +458,17 @@ class FirebaseDatabaseManager (){
 
     fun getAccountImg(account_id: String, imageView: ImageView){
         var prof_img: ByteArray? = null
-        var myRef = database.getReference(KEY_ACCOUNT)
+        val myRef = database.getReference(KEY_ACCOUNT)
         myRef.child(account_id).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 println(p0.message)
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                var prof_img_string = snapshot.child(KEY_PROF).value.toString()
-                if(prof_img_string != null && prof_img_string.isNotEmpty())
+                val prof_img_string = snapshot.child(KEY_PROF).value.toString()
+                if(prof_img_string.isNotEmpty())
                     prof_img = Base64.decode(prof_img_string, Base64.DEFAULT)
-                    var bitmap = BitmapFactory.decodeByteArray(prof_img, 0, prof_img!!.size)
+                    val bitmap = BitmapFactory.decodeByteArray(prof_img, 0, prof_img!!.size)
                     imageView.setImageBitmap(bitmap)
             }
         })

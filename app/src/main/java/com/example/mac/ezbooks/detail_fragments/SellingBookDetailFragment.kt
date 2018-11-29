@@ -52,7 +52,7 @@ class SellingBookDetailFragment : Fragment() {
         view.detail_selling_book_instructor.text = booksViewModel.selected_selling.instructor
 
         if(booksViewModel.selected_selling.book_img != null) {
-            var bitmap = BitmapFactory.decodeByteArray(booksViewModel.selected_selling.book_img,
+            val bitmap = BitmapFactory.decodeByteArray(booksViewModel.selected_selling.book_img,
                     0, booksViewModel.selected_selling.book_img!!.size)
             view.detail_selling_book_image.setImageBitmap(bitmap)
         }
@@ -75,8 +75,8 @@ class SellingBookDetailFragment : Fragment() {
             }
 
             databaseManager = FirebaseDatabaseManager()
-            var textbook : Textbooks = booksViewModel.selected_selling.copy()
-            var sText = Searched_Textbooks(booksViewModel.user_account.user_id, textbook.book_id,
+            val textbook : Textbooks = booksViewModel.selected_selling.copy()
+            val sText = Searched_Textbooks(booksViewModel.user_account.user_id, textbook.book_id,
                     booksViewModel.user_account.user_name, booksViewModel.user_account.email_address,
                     booksViewModel.user_account.phone_number, textbook.Title, textbook.isbn,
                     textbook.course, textbook.instructor, textbook.book_img, textbook.potential_buyers)
@@ -90,7 +90,7 @@ class SellingBookDetailFragment : Fragment() {
             //This should remove all associated users from the selected selling, then delete all occurances of the textbook
 
             for(buyer in sText.potential_buyers!!)
-                databaseManager.removeOtherUser(booksViewModel, sText, buyer)
+                databaseManager.removeOtherUser(sText, buyer)
 
             val fragmentManager = activity?.supportFragmentManager
             fragmentManager?.popBackStack()
@@ -108,7 +108,7 @@ class SellingBookDetailFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         UserNamesRecyclerview = recyclerView2
-        UserNamesadapter = UserNamesRecyclerAdapter(this, booksViewModel, booksViewModel.selected_selling)
+        UserNamesadapter = UserNamesRecyclerAdapter(this, booksViewModel)
         UserNamesRecyclerview.adapter = UserNamesadapter
         UserNameslayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         UserNamesRecyclerview.layoutManager = UserNameslayoutManager
