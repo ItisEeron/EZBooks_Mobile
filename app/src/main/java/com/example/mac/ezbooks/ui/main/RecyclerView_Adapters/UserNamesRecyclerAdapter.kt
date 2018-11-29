@@ -1,19 +1,13 @@
 package com.example.mac.ezbooks.ui.main.RecyclerView_Adapters
 
-import android.arch.lifecycle.ViewModel
-import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.mac.ezbooks.R
-import com.example.mac.ezbooks.detail_fragments.ReportUserFragment
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer

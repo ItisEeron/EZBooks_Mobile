@@ -14,8 +14,6 @@ import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
-import com.example.mac.ezbooks.ui.main.Textbooks
-import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.detail_requested_books_layout.view.*
 
 class RequestedBookDetailFragment : Fragment() {

@@ -1,7 +1,6 @@
 package com.example.mac.ezbooks.detail_fragments
 
 import android.arch.lifecycle.ViewModelProviders
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
@@ -52,50 +51,19 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
         //Time to initialze the remaining view
         //Add to the name and the image. That is all!!
         view.reported_user_name.text = booksViewModel.selected_requested.user_name
-        /*if(reported_Account.profile_img != null){
-            var bitmap = BitmapFactory.
-            decodeByteArray(reported_Account.profile_img,
-                    0, reported_Account!!.profile_img!!.size)
-            view.reported_user_image.setImageBitmap(bitmap)
-        }
-        else
-            view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
-            */
         view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
-
+        firebaseDatabaseManager.getAccountImg(booksViewModel.selected_requested.userid!!, view.reported_user_image)
 
         //Now time to initialize the buttons
         view.submit_report_button.setOnClickListener {
             if (reportString != null) {
-                /*
-                //Test to see if the user has never been reported! If not, initalize reported
-                //reasons map
-                if (reported_Account.reported_flags!!.reported_reasons == null)
-                    reported_Account.reported_flags!!.reported_reasons = mutableMapOf(Pair<String, Int>(reportString, 0))
+                var other_reason = view.other_explaination.text.toString()
 
-                //Test to see if the user has been reported for the reported reason!!
-                if(!(reported_Account.reported_flags!!.reported_reasons!!.containsKey(reportString))){
-                    reported_Account.reported_flags!!.reported_reasons!!.put(reportString, 1)
-                }else{
-                    var i = reported_Account.reported_flags!!.reported_reasons!![reportString]
-                    i = i!!.plus(1)
-                    reported_Account.reported_flags!!.reported_reasons!![reportString] = i
-                }
 
-                //Want to add to the other reasons log!!! //RECALL OTHERS WILL NOT READ FROM DATABASE
-                //TO APP, IT IS STRICTLY FOR LOGGING PURPOSES
-                if(reportString == "Other"){
-                    //No reason has been given to the user yet, then create the arraylist
-                    if (reported_Account!!.reported_flags!!.other_reason_log == null){
-                        reported_Account!!.reported_flags!!.other_reason_log = arrayListOf()
-                    }
-                    //Now input the string of characters for the reason inputted
-                    if(!(view.other_explaination.text.isEmpty())) {
-                        reported_Account!!.reported_flags!!.other_reason_log!!
-                                .add(view.other_explaination.text.toString())
-                    }
-                }
-                */
+
+                firebaseDatabaseManager.reportUser(booksViewModel, reportString,
+                        if(other_reason.isEmpty()) null else other_reason)
+                firebaseDatabaseManager.removeRequest(booksViewModel, booksViewModel.selected_requested)
 
                 //Now Remove the Book So the User does not have to deal with an unwanted seller!!
                 if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){

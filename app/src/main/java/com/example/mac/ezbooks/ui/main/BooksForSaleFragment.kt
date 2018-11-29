@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.mac.ezbooks.R
-import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.R_B_RecyclerAdapter
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.UploadBooksRecyclerAdapter
 import kotlinx.android.synthetic.main.books_for_sale_layout.*
 

@@ -88,4 +88,9 @@ class LoginActivity : AppCompatActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
     }
+
+    override fun onPause() {
+        progressBar.dismiss()
+        super.onPause()
+    }
 }

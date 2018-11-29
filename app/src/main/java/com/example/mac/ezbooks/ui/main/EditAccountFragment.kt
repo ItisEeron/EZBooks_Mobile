@@ -3,7 +3,6 @@ package com.example.mac.ezbooks.ui.main
 import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.NavigationView
@@ -17,17 +16,11 @@ import kotlinx.android.synthetic.main.edit_user_account_layout.view.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Environment
-import android.support.v4.content.FileProvider
 import android.util.Log
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
-
 
 class EditAccountFragment : Fragment(){
 
@@ -38,7 +31,6 @@ class EditAccountFragment : Fragment(){
     private var imageHandler : ImageHandler = ImageHandler()
     val GET_FROM_GALLERY = 3
     val REQUEST_IMAGE_CAPTURE = 1
-    val REQUEST_TAKE_PHOTO = 1
 
     override fun onCreate(savedInstanceState : Bundle?) {
         //Super allows the original function to execute then you add your own code

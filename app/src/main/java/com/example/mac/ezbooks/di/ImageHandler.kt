@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.FileProvider
 import android.widget.ImageView
-import kotlinx.android.synthetic.main.upload_book_layout.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException

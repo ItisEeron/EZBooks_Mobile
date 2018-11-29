@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -18,7 +19,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
-import com.example.mac.ezbooks.loginAccount.ChangePasswordActivity
 import com.example.mac.ezbooks.loginAccount.ChangePasswordFragment
 import com.example.mac.ezbooks.loginAccount.VerifyAccount
 import com.example.mac.ezbooks.ui.main.*
@@ -319,7 +319,10 @@ class MainActivity : AppCompatActivity()  {
 
     //Keeps the navigation drawer in the correct placement when back is pressed
     supportFragmentManager.addOnBackStackChangedListener {
-        var fragment = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount -1).name
+        var fragment = " "
+        if (supportFragmentManager.backStackEntryCount > 0)
+            fragment = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount -1).name!!
+
         when (fragment){
             "homeFrag"->{
                 var menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
@@ -374,58 +377,64 @@ class MainActivity : AppCompatActivity()  {
     //This function will display the different screens stemming from the main activity
     fun displayScreen(id: Int) {
 
-       when (id) {
+        var fragment = ""
+        if(supportFragmentManager.backStackEntryCount > 0) {
+            fragment = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount - 1).name!!
+        }
+
+        when (id) {
 
             R.id.nav_edit_credentials->{
-                supportFragmentManager.beginTransaction().
-                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
-                                R.anim.abc_fade_in,R.anim.abc_fade_out).
-                        replace(R.id.flContent,
-                        EditAccountFragment()).addToBackStack("editAccount").commit()
+                if(fragment != "editAccount") {
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                            R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                            EditAccountFragment()).addToBackStack("editAccount").commit()
+                }
             }
             R.id.nav_add_listing->{
-                supportFragmentManager.beginTransaction().
-                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
-                        R.anim.abc_fade_in,R.anim.abc_fade_out).
-                        replace(R.id.flContent,
-                        UploadBookFragment()).addToBackStack("uploadBook").commit()
+                if(fragment != "uploadBook") {
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in,
+                            R.anim.abc_fade_out, R.anim.abc_fade_in, R.anim.abc_fade_out).
+                            replace(R.id.flContent,
+                            UploadBookFragment()).addToBackStack("uploadBook").commit()
+                }
             }
             R.id.nav_requested_books->{
-                supportFragmentManager.beginTransaction().
-                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
-                                R.anim.abc_fade_in,R.anim.abc_fade_out).
-                        replace(R.id.flContent,
-                        RequestedBooksFragment()).addToBackStack("requestedBooks").commit()
+                if(fragment != "requestedBook") {
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                            R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                            RequestedBooksFragment()).addToBackStack("requestedBooks").commit()
+                }
             }
             R.id.nav_books_you_sell->{
-                supportFragmentManager.beginTransaction().
-                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
-                                R.anim.abc_fade_in,R.anim.abc_fade_out).
-                        replace(R.id.flContent,
-                        BooksForSaleFragment()).addToBackStack("booksforSale").commit()
+                if(fragment != "booksforSale") {
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in,
+                            R.anim.abc_fade_out, R.anim.abc_fade_in, R.anim.abc_fade_out).
+                            replace(R.id.flContent,
+                            BooksForSaleFragment()).addToBackStack("booksforSale").commit()
+                }
             }
             R.id.nav_search_shop->{
-                //startActivity(Intent(this, SearchActivity::class.java))
-                supportFragmentManager.beginTransaction().
-                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
-                                R.anim.abc_fade_in,R.anim.abc_fade_out).
-                        replace(R.id.flContent,
-                        SearchFragment()).addToBackStack("searchShop").commit()
+                if(fragment != "searchShop") {
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                            R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                            SearchFragment()).addToBackStack("searchShop").commit()
+                }
 
             }
             R.id.nav_change_password->{
-                supportFragmentManager.beginTransaction().
-                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
-                                R.anim.abc_fade_in,R.anim.abc_fade_out).
-                        replace(R.id.flContent,
-                                ChangePasswordFragment()).addToBackStack("changePassword").commit()
+                if(fragment != "changePassword") {
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                            R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                            ChangePasswordFragment()).addToBackStack("changePassword").commit()
+                }
             }
             R.id.nav_verify_account->{
-                supportFragmentManager.beginTransaction().
-                        setCustomAnimations( R.anim.abc_fade_in,R.anim.abc_fade_out,
-                                R.anim.abc_fade_in,R.anim.abc_fade_out).
-                        replace(R.id.flContent,
-                                VerifyAccount()).addToBackStack("verifyAccount").commit()
+                if(fragment != "verifyAccount") {
+                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                            R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                            VerifyAccount()).addToBackStack("verifyAccount").commit()
+                }
             }
             R.id.nav_sign_out->{
                 FirebaseAuth.getInstance().signOut()
@@ -440,9 +449,11 @@ class MainActivity : AppCompatActivity()  {
                 startActivity(intent)
             }
             else -> {
-                supportFragmentManager.beginTransaction().replace(R.id.flContent,
-                        HomeFragment()).addToBackStack("homeFrag").commit()
-                title = "EZ-Books Home"
+                if(fragment != "homeFrag") {
+                    supportFragmentManager.beginTransaction().replace(R.id.flContent,
+                            HomeFragment()).addToBackStack("homeFrag").commit()
+                    title = "EZ-Books Home"
+                }
 
 
             }

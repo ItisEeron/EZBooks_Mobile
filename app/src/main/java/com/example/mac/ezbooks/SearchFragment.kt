@@ -1,10 +1,7 @@
 package com.example.mac.ezbooks
 
-import android.app.ListActivity
-import android.app.SearchManager
+
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.SearchAdapter
@@ -17,17 +14,13 @@ import android.text.Editable
 import android.text.TextWatcher
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import org.w3c.dom.Text
-import android.text.method.TextKeyListener.clear
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.mac.ezbooks.R.id.recyclerView
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
-import java.io.Serializable
 
 
 class SearchFragment :  Fragment() {

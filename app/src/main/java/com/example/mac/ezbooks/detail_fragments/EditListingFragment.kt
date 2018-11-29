@@ -5,14 +5,10 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
-import android.support.v4.content.FileProvider
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,29 +18,21 @@ import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
 import com.example.mac.ezbooks.ui.main.MainViewModel
-import com.example.mac.ezbooks.ui.main.Textbooks
-import kotlinx.android.synthetic.main.books_for_sale_layout.view.*
 import kotlinx.android.synthetic.main.upload_book_layout.*
 import kotlinx.android.synthetic.main.upload_book_layout.view.*
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
+
 
 class EditListingFragment : Fragment() {
     private lateinit var booksViewModel : MainViewModel
     private var mCurrentPhotoPath: String = ""
-    private lateinit var newTextbooks : Textbooks
     private var pendingUpload: ByteArray? = null
     private var imageHandler : ImageHandler = ImageHandler()
     private val databaseManager = FirebaseDatabaseManager()
 
     val GET_FROM_GALLERY = 3
     val REQUEST_IMAGE_CAPTURE = 1
-    val REQUEST_TAKE_PHOTO = 1
-    val RECENT_LIST_SIZE = 5
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.upload_book_layout, container, false)

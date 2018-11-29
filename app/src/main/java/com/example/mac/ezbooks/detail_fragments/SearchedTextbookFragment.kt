@@ -11,15 +11,12 @@ import android.widget.Toast
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
-import com.example.mac.ezbooks.ui.main.Potential_Buyer
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
 import kotlinx.android.synthetic.main.detail_requested_books_layout.view.*
 
 class SearchedTextbookFragment : Fragment() {
     val databaseManager : FirebaseDatabaseManager = FirebaseDatabaseManager()
     lateinit var booksViewModel: MainViewModel
-    val RECENTS_SIZE = 5
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.detail_requested_books_layout, container, false)

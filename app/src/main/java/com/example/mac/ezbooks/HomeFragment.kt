@@ -5,29 +5,16 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.*
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.R_B_RecyclerAdapter
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.UploadBooksRecyclerAdapter
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.home_fragment.view.*
-import android.app.Activity
-
-
-//import kotlinx.android.synthetic.main.item_row.view.*
 
 
 class HomeFragment : Fragment() {
@@ -38,8 +25,6 @@ class HomeFragment : Fragment() {
 
 
     private lateinit var booksViewModel: MainViewModel
-    private lateinit var booksList: ArrayList<Textbooks>
-    private lateinit var main_Account: UserAccount
 
     //For first Requested Books Recycler View!!!!
     private lateinit var requestedbookslayoutManager: RecyclerView.LayoutManager
@@ -60,14 +45,6 @@ class HomeFragment : Fragment() {
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
-
-        //booksViewModel.getAllTextbooks(this)
-
-
-        //databaseManager.retrieveRequestedTextbookList(104955L, booksViewModel, this, null)
-        //databaseManager.retrieveSellingTextbookList(104955L, booksViewModel, this)
-
-
 
     }
 

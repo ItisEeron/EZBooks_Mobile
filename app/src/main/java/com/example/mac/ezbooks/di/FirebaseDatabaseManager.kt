@@ -1,19 +1,15 @@
 package com.example.mac.ezbooks.di
 
 import android.app.Activity
-import android.arch.lifecycle.MutableLiveData
+import android.graphics.BitmapFactory
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
-import android.support.v7.widget.RecyclerView
 import android.util.Base64
 import android.util.Log
-import com.example.mac.ezbooks.HomeFragment
+import android.widget.ImageView
 import com.example.mac.ezbooks.ui.main.*
-import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.R_B_RecyclerAdapter
-import com.google.firebase.FirebaseError
 import com.google.firebase.database.*
-import org.w3c.dom.Text
-import java.sql.ResultSet
+
 
 class FirebaseDatabaseManager (){
     private val KEY_ACCOUNT = "account"
@@ -27,7 +23,7 @@ class FirebaseDatabaseManager (){
     private val KEY_PHONE = "phone_number"
     private val KEY_PROF = "profile_img"
     private val KEY_REQ_BOOKS = "req_books"
-
+    private val KEY_OTHERS_LOG = "others_log"
     private val KEY_BOOK_ID = "book_id"
     private val KEY_TITLE = "title"
     private val KEY_ISBN = "isbn"
@@ -123,22 +119,9 @@ class FirebaseDatabaseManager (){
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-
                 inputAccount(snapshot, viewModel, null)
-                /*
-                var ft: FragmentTransaction = fragment.activity!!.supportFragmentManager.beginTransaction()
-                ft.detach(fragment)
-                ft.attach(fragment)
-                ft.commit()
-                */
-                /*
-                if(textbook == null)
-                    retrieveSellingTextbookList(viewModel, fragment)
-                    retrieveRequestedTextbookList(viewModel, fragment)
-                    */
 
             }
-
         })
 
     }
@@ -230,7 +213,7 @@ class FirebaseDatabaseManager (){
 
     }
 
-    fun retrieveSellingTextbookList(user_id: String, viewModel: MainViewModel, fragment: Fragment?) {
+    fun retrieveSellingTextbookList(user_id: String, viewModel: MainViewModel, fragment: Fragment?, activity: Activity?) {
         var myRef = database.getReference(KEY_ACCOUNT)
                 .child(user_id).child(KEY_TEXTBOOK)
         myRef.addValueEventListener(object : ValueEventListener {
@@ -302,6 +285,7 @@ class FirebaseDatabaseManager (){
                         viewModel.recent_selling_Textbooks.addAll(viewModel.selling_textbooks)
                     }
 
+
                     if(fragment != null) {
                         var ft: FragmentTransaction = fragment.activity!!.supportFragmentManager.beginTransaction()
                         ft.detach(fragment)
@@ -351,7 +335,7 @@ class FirebaseDatabaseManager (){
         var email: String? = null
         var class_standing: String? = null
         var prof_img: ByteArray? = null
-
+        var reported_flags = 0L
         for (item in iter) {
             println("Eeron ${item}")
             when (item.key) {
@@ -359,10 +343,10 @@ class FirebaseDatabaseManager (){
                     id = item.value as String
                 }
                 KEY_PHONE -> {
-                    phone_number = item.value as String
+                    phone_number = item.value.toString()
                 }
                 KEY_CLASS -> {
-                    class_standing = item.value as String
+                    class_standing = item.value.toString()
                 }
                 KEY_EMAIL -> {
                     email = item.value as String
@@ -371,8 +355,17 @@ class FirebaseDatabaseManager (){
                     name = item.value as String
                 }
                 KEY_PROF -> {
-                    var prof_img_string = item.value as String
-                    prof_img = Base64.decode(prof_img_string, Base64.DEFAULT)
+                    var prof_img_string = item.value.toString()
+                    if(prof_img_string != null && prof_img_string.isNotEmpty())
+                        prof_img = Base64.decode(prof_img_string, Base64.DEFAULT)
+                }
+                KEY_REPORTS -> {
+                    var reports = item.children
+                    for(report in reports){
+                        if(report.key != "others_log"){
+                            reported_flags = reported_flags + report.value.toString().toLong()
+                        }
+                    }
                 }
             }//when
         }//for
@@ -380,10 +373,10 @@ class FirebaseDatabaseManager (){
 
         if(textbook != null){
             textbook.affiliated_account = UserAccount(id, prof_img, name, email, phone_number,
-                    "", 0, class_standing, null)
+                    "", if(reported_flags > 20) -1 else 1, class_standing)
         }else {
             viewModel.user_account = UserAccount(id, prof_img, name, email, phone_number,
-                    "", 0, class_standing, null)
+                    "", if(reported_flags > 20) -1 else 1, class_standing)
         }
 
         Log.d("Eeron Tag: ", name + " " + email + " " + phone_number)
@@ -437,9 +430,45 @@ class FirebaseDatabaseManager (){
 
     }
 
-    fun reportUser(){
-        var myRef = database.getReference(KEY_ACCOUNT).child(viewModel.user_account.user_id!!).child(KEY_TEXTBOOK)
-                .child(textbook.bookid.toString()).child(KEY_POTENTIAL_BUYERS)
-                .child(buyer.account_id).child(KEY_BUYER_APPROVAL)
+    fun reportUser(viewModel: MainViewModel, report : String, other_reason : String?){
+        var myRef = database.getReference(KEY_ACCOUNT).child(viewModel.selected_requested.userid!!)
+                .child(KEY_REPORTS).child(report)
+        myRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var report_count =  1L
+                if(snapshot.value != null){
+                    report_count = (snapshot.value as Long) + 1L
+                }
+
+                myRef.setValue(report_count)
+
+                if(other_reason != null){
+                    myRef.parent!!.child(KEY_OTHERS_LOG).child(report_count.toString())
+                            .setValue(other_reason)
+                }
+
+            }
+        })
+    }
+
+    fun getAccountImg(account_id: String, imageView: ImageView){
+        var prof_img: ByteArray? = null
+        var myRef = database.getReference(KEY_ACCOUNT)
+        myRef.child(account_id).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                println(p0.message)
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var prof_img_string = snapshot.child(KEY_PROF).value.toString()
+                if(prof_img_string != null && prof_img_string.isNotEmpty())
+                    prof_img = Base64.decode(prof_img_string, Base64.DEFAULT)
+                    var bitmap = BitmapFactory.decodeByteArray(prof_img, 0, prof_img!!.size)
+                    imageView.setImageBitmap(bitmap)
+            }
+        })
     }
 }
