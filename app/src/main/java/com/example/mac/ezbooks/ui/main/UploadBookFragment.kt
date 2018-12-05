@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.NavigationView
@@ -13,6 +14,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.di.*
@@ -113,7 +115,6 @@ class UploadBookFragment : Fragment(){
         if(context!!.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             view.upload_from_camera_button.setOnClickListener {
                 imageHandler.dispatchTakePictureIntent(this, this.activity!! , mCurrentPhotoPath)
-                Log.i("Eeron Log", "I Made it!!")
                 //setPic()
             }
         }
@@ -137,11 +138,10 @@ class UploadBookFragment : Fragment(){
                     try {
                         var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
                                 ?.getContentResolver(), selectedImage)
-                        user_image.setImageBitmap(bitmap)
+                        view?.user_image?.setImageBitmap(bitmap)
                         var stream = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
                         pendingUpload = stream.toByteArray()
-
                     } catch (e: IOException) {
                         Log.i("TAG", "Some exception " + e)
                     }

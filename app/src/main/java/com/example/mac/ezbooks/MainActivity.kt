@@ -327,11 +327,8 @@ class MainActivity : AppCompatActivity()  {
                 "editAccount"->{
                     menuItem = navigationView.menu.getItem(1).subMenu.getItem(0)
                 }
-                "verifyAccount"->{
-                    menuItem = navigationView.menu.getItem(1).subMenu.getItem(1)
-                }
                 "changePassword"->{
-                    menuItem = navigationView.menu.getItem(1).subMenu.getItem(2)
+                    menuItem = navigationView.menu.getItem(1).subMenu.getItem(1)
                 }
                 else->{
                     menuItem = navigationView.menu.getItem(2).subMenu.getItem(1)
