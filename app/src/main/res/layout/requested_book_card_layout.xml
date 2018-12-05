@@ -35,7 +35,10 @@
             android:layout_toEndOf="@+id/item_image"
             android:layout_toRightOf="@+id/item_image"
             android:layout_alignParentTop="true"
-            android:textSize="30sp" />
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="25sp"
+            android:autoSizeMaxTextSize="30sp"
+            android:autoSizeStepGranularity="4sp" />
 
         <TextView
             android:id="@+id/item_isbn"

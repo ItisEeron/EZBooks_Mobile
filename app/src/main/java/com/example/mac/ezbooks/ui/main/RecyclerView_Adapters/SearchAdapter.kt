@@ -39,10 +39,6 @@ class SearchAdapter (fragment : Fragment, searchedQuery : ArrayList<Searched_Tex
 
             itemView.setOnClickListener{view ->
                 var position: Int = adapterPosition
-                //TODO: Call Fragment that shows detailed information based on the book
-                /*Toast.makeText(context,
-                        "You have clicked on  item" + position,
-                        Toast.LENGTH_LONG).show()*/
                 val b = Bundle()
                 b.putSerializable("textbook", searchedQuery[position])
                 var newFragment = SearchedTextbookFragment()

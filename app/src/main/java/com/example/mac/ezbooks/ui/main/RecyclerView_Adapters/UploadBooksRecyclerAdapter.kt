@@ -54,7 +54,6 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, i: Int) {
-        //TODO: ADD CONDITIONS FOR SELLING TEXTBOOKS AS WELL
         if(fragment is HomeFragment) {
             viewHolder.itemTitle.text = viewModel.recent_selling_Textbooks[i].Title
             viewHolder.itemISBN.text = viewModel.recent_selling_Textbooks[i].isbn

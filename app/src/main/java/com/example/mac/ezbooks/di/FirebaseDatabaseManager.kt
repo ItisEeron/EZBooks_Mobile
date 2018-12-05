@@ -2,11 +2,14 @@ package com.example.mac.ezbooks.di
 
 import android.app.Activity
 import android.graphics.BitmapFactory
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.util.Base64
 import android.util.Log
 import android.widget.ImageView
+import android.widget.TextView
+import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.ui.main.*
 import com.google.firebase.database.*
 
@@ -111,7 +114,7 @@ class FirebaseDatabaseManager (){
     }
 
     //Read from database
-    fun retrieveAccount(id : String , viewModel: MainViewModel){
+    fun retrieveAccount(id : String , viewModel: MainViewModel, navigationView: NavigationView?){
         val myRef = database.getReference(KEY_ACCOUNT)
         myRef.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -120,6 +123,21 @@ class FirebaseDatabaseManager (){
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 inputAccount(snapshot, viewModel, null)
+
+                //Set up Navigation Header//////////////////////////////////////////////////////////
+                navigationView?.getHeaderView(0)?.
+                        findViewById<TextView>(R.id.user_header_name)
+                        ?.text = viewModel.user_account.user_name
+
+                if(viewModel.user_account.profile_img != null){
+                    var bitmap = BitmapFactory.
+                            decodeByteArray(viewModel.user_account.profile_img,
+                                    0, viewModel.user_account.profile_img!!.size)
+
+                    navigationView?.getHeaderView(0)?.
+                            findViewById<ImageView>(R.id.user_header_image)?.setImageBitmap(bitmap)
+                }
+                ////////////////////////////////////////////////////////////////////////////////////
 
             }
         })

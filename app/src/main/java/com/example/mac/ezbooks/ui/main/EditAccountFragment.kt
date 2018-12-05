@@ -101,7 +101,6 @@ class EditAccountFragment : Fragment(){
                 view.user_account_Image.setImageBitmap(bitmap)
             }
             else{
-                //TODO: SET IMAGE TO DEFAULT VALUE
                 view.user_account_Image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
             }
         }
@@ -114,7 +113,6 @@ class EditAccountFragment : Fragment(){
 
         if(context!!.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             view.upload_from_camera_button.setOnClickListener {
-                //TODO: RESET IMAGE TO PREVIOUS
                 imageHandler.dispatchTakePictureIntent(this , this.activity!!, mCurrentPhotoPath)
                 Log.i("Eeron Log", "I Made it!!")
                 //setPic()

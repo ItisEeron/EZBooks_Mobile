@@ -1,6 +1,7 @@
 package com.example.mac.ezbooks.ui.main
 
 import android.arch.lifecycle.ViewModel
+import android.support.design.widget.NavigationView
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import java.io.Serializable
 
@@ -16,7 +17,7 @@ class MainViewModel : ViewModel() {
     private val databaseManager = FirebaseDatabaseManager()
 
 
-    fun getAllTextbooks(user_id : String, user_name: String?, user_email: String?) {
+    fun getAllTextbooks(user_id : String, user_name: String?, user_email: String?, navigationView: NavigationView?) {
         if(!::user_account.isInitialized){
             user_account =  UserAccount(user_id, null,user_name,
                     user_email, null, "5/17/18",
@@ -31,21 +32,19 @@ class MainViewModel : ViewModel() {
             requested_textbooks = mutableListOf()
             recent_requested_Textbooks = mutableListOf()
         }
-        getUserAccount(user_id)
+        getUserAccount(user_id, navigationView)
 
 
     }
 
-    private fun getUserAccount(user_id : String){
+    private fun getUserAccount(user_id : String, navigationView: NavigationView?){
         // Do an asynchronous operation to fetch user
-        // TODO: Get data from database; using fake data for now
-        databaseManager.retrieveAccount(user_id, this)
+        databaseManager.retrieveAccount(user_id, this, navigationView)
     }//getUserAccount
 }
 
 
 //TODO:CHECK WITH OTHER EZ-BOOKS MEMBERS TO MAKE SURE INFORMATION IS VALID!!
-//TODO: ADD A MUTABLE MAP IN TEXTBOOKS TO ALLOW THE SELLER TO CLEAR USERS TO VIEW THEIR INFORMATION
 data class Textbooks( val book_id: Long, var Title:String, var isbn:String, var book_img: ByteArray?, var instructor:String?, var course:String?,
                      var affiliated_account:UserAccount?, var potential_buyers: MutableList<Potential_Buyer>?)
 data class UserAccount(var user_id: String?, var profile_img: ByteArray?, var user_name:String?, var email_address:String?,

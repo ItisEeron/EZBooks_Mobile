@@ -37,7 +37,6 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
             itemView.setOnClickListener{view ->
                 var position: Int = adapterPosition
                 viewModel.selected_requested = viewModel.requested_textbooks[position]
-                //TODO: Call Fragment that shows detailed information based on the book
                  fragment.activity?.supportFragmentManager?.beginTransaction()?.
                         setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
                         RequestedBookDetailFragment())?.addToBackStack(null)?.commit()
@@ -52,7 +51,6 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, i: Int) {
-        //TODO: ADD CONDITIONS FOR SELLING TEXTBOOKS AS WELL
         if(fragment is HomeFragment) {
             viewHolder.itemTitle.text = viewModel.recent_requested_Textbooks[i].title
             viewHolder.itemISBN.text = viewModel.recent_requested_Textbooks[i].isbn

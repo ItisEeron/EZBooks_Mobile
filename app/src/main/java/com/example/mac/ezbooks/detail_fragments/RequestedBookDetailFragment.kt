@@ -68,7 +68,6 @@ class RequestedBookDetailFragment : Fragment() {
         }
 
         view.remove_button.setOnClickListener{
-         //TODO: remove this referenced listing in the data base. Any connection made between this textbook and user should be removed
 
             //Update the home page view...Remove the book if it is found in the homepage recycler view, also adjust the view when removed
             booksViewModel.recent_requested_Textbooks.clear()

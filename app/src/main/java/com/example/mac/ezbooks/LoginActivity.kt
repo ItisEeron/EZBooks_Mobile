@@ -25,7 +25,8 @@ class LoginActivity : AppCompatActivity() {
 
 
         //Get Firebase auth instance
-        auth = FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance()
+
 
         if (auth.getCurrentUser() != null) {
             startActivity(Intent(this, MainActivity::class.java))
@@ -57,7 +58,8 @@ class LoginActivity : AppCompatActivity() {
          }
 
         btnLogin.setOnClickListener{
-            var email = inputEmail.text.toString()
+            var email = inputEmail.text.toString().replace("\\s".toRegex(), "")
+
             var password = inputPassword.text.toString()
 
             if (TextUtils.isEmpty(email)) {

@@ -56,6 +56,7 @@
         android:fitsSystemWindows="true"
         android:foreground="?selectableItemBackground"
         app:menu="@menu/drawer_view"
+        app:headerLayout="@layout/navigation_header"
         android:focusable="true">
 
     </android.support.design.widget.NavigationView>

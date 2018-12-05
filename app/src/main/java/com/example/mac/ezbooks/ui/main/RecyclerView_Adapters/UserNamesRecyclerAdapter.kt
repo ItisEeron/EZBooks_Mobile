@@ -51,7 +51,7 @@ class UserNamesRecyclerAdapter(val fragment: Fragment, private val booksViewMode
             //Long Click to Remove user
             itemView.setOnLongClickListener{
                 val position: Int = getAdapterPosition()
-
+                
                 databaseManager.removeOtherUser(sText, buyerList!![position])
                 buyerList!!.removeAt(position)
 
