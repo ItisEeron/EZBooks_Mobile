@@ -56,7 +56,7 @@ class SearchFragment :  Fragment() {
         super.onCreate(savedInstanceState)
         //Changes Title
 
-        activity?.title = "Search for a Book"
+        //activity?.title = "Search for a Book"
         //Creates the viewModel neccessary for maintaining the data.
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
@@ -126,9 +126,9 @@ class SearchFragment :  Fragment() {
 
                 var counter = 0
                 var iter = snapshot.children
-                var exit = false
-
                 for (textbook in iter){
+                    var exit = false
+
                     val userid = textbook.child(KEY_ACCOUNT).value.toString()
                     val user_email = textbook.child(KEY_EMAIL).getValue(String::class.java)
                     val user_phone = textbook.child(KEY_PHONE).getValue(String::class.java)
@@ -144,6 +144,8 @@ class SearchFragment :  Fragment() {
                     if(book_img_string != null)
                         book_img =  Base64.decode(book_img_string, Base64.DEFAULT)
 
+                    if(userid == booksViewModel.user_account.user_id)
+                        exit = true
 
                     val potential_Buyer : MutableList<Potential_Buyer> = mutableListOf()
 
@@ -158,7 +160,7 @@ class SearchFragment :  Fragment() {
                         buyerApproval =  buyer.child(KEY_BUYER_APPROVAL).value as Boolean
 
                         if(buyerID == booksViewModel.user_account.user_id)
-                            //exit = true
+                            exit = true
 
                         potential_Buyer.add(Potential_Buyer(buyerID!!, buyerName!!, buyerApproval!!))
                     }
@@ -175,7 +177,7 @@ class SearchFragment :  Fragment() {
                         }
 
                     }
-                    if (counter == 20)
+                    if (counter == 100)
                         break
 
                 }

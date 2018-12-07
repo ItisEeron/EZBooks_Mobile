@@ -45,7 +45,7 @@ class SearchAdapter (fragment : Fragment, searchedQuery : ArrayList<Searched_Tex
                 newFragment.arguments = b
                 fragment?.fragmentManager?.beginTransaction()?.
                         setCustomAnimations(R.anim.design_snackbar_in, R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                        newFragment)?.addToBackStack("search_Detail")?.commit()
+                        newFragment, "search_Detail")?.addToBackStack("search_Detail")?.commit()
             }
         }
     }

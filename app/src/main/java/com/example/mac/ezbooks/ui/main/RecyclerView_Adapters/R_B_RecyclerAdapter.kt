@@ -2,6 +2,7 @@ package com.example.mac.ezbooks.ui.main.RecyclerView_Adapters
 
 import android.graphics.BitmapFactory
 import android.support.v4.app.Fragment
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -47,6 +48,14 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ViewHolder {
         val v = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.requested_book_card_layout, viewGroup, false)
+        for(buyer in viewModel!!.requested_textbooks[i]!!.potential_buyers!!){
+            if (buyer.account_id == viewModel.user_account.user_id && !buyer.approved){
+                v.findViewById<CardView>(R.id.card_view)
+                        .setCardBackgroundColor(fragment.context!!.resources
+                                .getColor(R.color.btn_logut_bg))
+            }
+        }
+
         return ViewHolder(v)
     }
 

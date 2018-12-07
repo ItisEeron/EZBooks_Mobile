@@ -469,7 +469,6 @@ class FirebaseDatabaseManager (){
                     myRef.parent!!.child(KEY_OTHERS_LOG).child(report_count.toString())
                             .setValue(other_reason)
                 }
-
             }
         })
     }

@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity()  {
         }
 
         override fun onDataChange(snapshot: DataSnapshot) {
+            requested_book_ids.clear()
             val id_iter = snapshot.children
             for (textbook in id_iter) {
                 requested_book_ids.add(textbook.key!!)
@@ -327,11 +328,8 @@ class MainActivity : AppCompatActivity()  {
                 "editAccount"->{
                     menuItem = navigationView.menu.getItem(1).subMenu.getItem(0)
                 }
-                "verifyAccount"->{
-                    menuItem = navigationView.menu.getItem(1).subMenu.getItem(1)
-                }
                 "changePassword"->{
-                    menuItem = navigationView.menu.getItem(1).subMenu.getItem(2)
+                    menuItem = navigationView.menu.getItem(1).subMenu.getItem(1)
                 }
                 else->{
                     menuItem = navigationView.menu.getItem(2).subMenu.getItem(1)
@@ -425,7 +423,6 @@ class MainActivity : AppCompatActivity()  {
                 if(fragmentName != "homeFrag") {
                     supportFragmentManager.beginTransaction().replace(R.id.flContent,
                             HomeFragment(),"homeFrag").addToBackStack("homeFrag").commit()
-                    title = "EZ-Books Home"
                 }
 
 
@@ -469,8 +466,8 @@ class MainActivity : AppCompatActivity()  {
 
     override fun onBackPressed() {
         if(supportFragmentManager.backStackEntryCount == 1) {
-            val intent = Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
+            val intent = Intent(Intent.ACTION_MAIN)
+            intent.addCategory(Intent.CATEGORY_HOME)
             startActivity(intent)
         }
         super.onBackPressed()
@@ -485,8 +482,6 @@ class MainActivity : AppCompatActivity()  {
         val myRef1 = database.getReference(KEY_ACCOUNT)
                 .child(mUser!!.uid).child(KEY_REQ_BOOKS)
         myRef1.addValueEventListener(requestedBooksListener)
-
-
 
         super.onStart()
     }

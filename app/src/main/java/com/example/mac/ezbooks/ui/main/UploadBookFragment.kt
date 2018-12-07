@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.NavigationView
@@ -37,7 +38,7 @@ class UploadBookFragment : Fragment(){
     override fun onCreate(savedInstanceState : Bundle?) {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
-        activity?.title = "Upload a Book to Sell"
+        //activity?.title = "Upload a Book to Sell"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,6 +47,10 @@ class UploadBookFragment : Fragment(){
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
 
+        if(pendingUpload != null){
+            val bitmap = BitmapFactory.decodeByteArray(pendingUpload, 0, pendingUpload!!.size)
+            view.user_image.setImageBitmap(bitmap)
+        }
 
         view.submit_book_button.setOnClickListener {
             //Ensures that the id of each new textbook will never collide!!!!
@@ -97,9 +102,7 @@ class UploadBookFragment : Fragment(){
             view.book_course_editText.text.clear()
             view.book_instructor_editText.text.clear()
             pendingUpload = null
-
             view.user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
-
         }
 
         //Upload an image from the gallery. Camera should not be needed for this

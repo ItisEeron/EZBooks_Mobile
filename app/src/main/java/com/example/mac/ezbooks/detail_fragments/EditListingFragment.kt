@@ -70,8 +70,6 @@ class EditListingFragment : Fragment() {
             //Navigate back home
             fragmentManager?.popBackStack()
             //Task to keep the home page labels intact
-            activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
-            activity?.title ="EZ Books Home"
 
             Toast.makeText(activity, "You have edited your textbook!",
                     Toast.LENGTH_LONG).show()

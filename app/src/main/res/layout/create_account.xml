@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:layout_below="@id/et_password"
-        android:background="@color/colorAccent"
+        style="@style/CustomStyleButton"
         android:text="@string/create_account"
         android:textColor="@android:color/white"
         android:textStyle="bold" />

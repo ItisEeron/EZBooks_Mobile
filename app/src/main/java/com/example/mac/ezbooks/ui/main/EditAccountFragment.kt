@@ -17,6 +17,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.widget.ImageView
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
 import java.io.ByteArrayOutputStream
@@ -32,11 +33,11 @@ class EditAccountFragment : Fragment(){
     val GET_FROM_GALLERY = 3
     val REQUEST_IMAGE_CAPTURE = 1
 
+
     override fun onCreate(savedInstanceState : Bundle?) {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
-        activity?.title = "Edit Your Account"
-
+        //activity?.title = "Edit Your Account"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,14 +47,19 @@ class EditAccountFragment : Fragment(){
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
 
+        if(pendingUpload != null){
+            val bitmap = BitmapFactory.decodeByteArray(pendingUpload, 0, pendingUpload!!.size)
+            view.user_account_Image.setImageBitmap(bitmap)
+        }
+
         main_account = ezbooksViewModel.user_account
 
         //Present User Account image as the uploaded image for this page
-        if(main_account.profile_img != null){
+        if(main_account.profile_img != null && pendingUpload == null){
             var bitmap = BitmapFactory.
                     decodeByteArray(main_account.profile_img,
                             0, main_account!!.profile_img!!.size)
-            view.user_account_Image.setImageBitmap(bitmap)
+            (view.user_account_Image as ImageView).setImageBitmap(bitmap)
         }
 
 
@@ -83,7 +89,6 @@ class EditAccountFragment : Fragment(){
             //Task to keep the home page labels intact
             activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
             activity?.title ="EZ Books Home"
-
 
         }
 

@@ -1,7 +1,10 @@
 package com.example.mac.ezbooks.ui.main.RecyclerView_Adapters
 
+import android.content.res.Resources
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.support.v4.app.Fragment
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +15,7 @@ import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.detail_fragments.SellingBookDetailFragment
 import com.example.mac.ezbooks.ui.main.MainViewModel
+import cz.msebera.android.httpclient.client.cache.Resource
 
 //Passes in Fragment in order to determine which List to use
 //If the Fragment is the HomeFragment, we only want the views to populate the with at most
@@ -50,6 +54,7 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
         //TODO: add uploaded_book_card_layout and replace request_book_card_layout with this
         val v = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.requested_book_card_layout, viewGroup, false)
+
         return ViewHolder(v)
     }
 

@@ -23,7 +23,7 @@ class RequestedBooksFragment : Fragment() {
     override fun onCreate(savedInstanceState : Bundle?) {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
-        activity?.title = "Textbooks You have Requested"
+        //activity?.title = "Textbooks You have Requested"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

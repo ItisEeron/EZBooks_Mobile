@@ -59,21 +59,19 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
             if (reportString != null) {
                 var other_reason = view.other_explaination.text.toString()
 
-
-
                 firebaseDatabaseManager.reportUser(booksViewModel, reportString,
                         if(other_reason.isEmpty()) null else other_reason)
                 firebaseDatabaseManager.removeRequest(booksViewModel, booksViewModel.selected_requested)
 
                 //Now Remove the Book So the User does not have to deal with an unwanted seller!!
-                if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){
+                /*if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){
                     booksViewModel.recent_requested_Textbooks.remove(booksViewModel.selected_requested)
 
                     if(booksViewModel.requested_textbooks.size > RECENTS_SIZE ){
                         booksViewModel.recent_requested_Textbooks.add(booksViewModel.requested_textbooks[RECENTS_SIZE-1])
                     }
                 }
-                booksViewModel.requested_textbooks.remove(booksViewModel.selected_requested)
+                booksViewModel.requested_textbooks.remove(booksViewModel.selected_requested)*/
 
                 Toast.makeText(activity,
                         "You have reported " + booksViewModel.selected_requested.user_name + ".",

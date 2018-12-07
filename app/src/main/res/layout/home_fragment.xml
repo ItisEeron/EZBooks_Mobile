@@ -7,8 +7,16 @@
     android:id="@+id/content_frame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/common_google_signin_btn_text_dark_disabled"
+    android:background="@color/colorAccent"
     android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/user_account_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/background_light"
+        android:text="@string/your_profile"
+        android:textAppearance="@android:style/TextAppearance.Large" />
 
     <android.support.v7.widget.CardView
         android:id="@+id/home_card1"
@@ -25,7 +33,7 @@
 
         <LinearLayout
             android:id="@+id/user_Account_Constraint"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -34,13 +42,22 @@
                 android:layout_height="128dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:contentDescription="TODO"
-                android:src="@mipmap/ic_launcher" />
+                android:background="@drawable/image_border"
+                android:src="@mipmap/ic_launcher"
+                app:civ_border_color="@color/colorAccent"
+                app:civ_border_width="4dp"></de.hdodenhof.circleimageview.CircleImageView>
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="13dp"
+                    app:srcCompat="@color/btn_login_bg" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -49,23 +66,18 @@
 
                     <TextView
                         android:id="@+id/textView_UserProfileTag"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="13dp"
-                        android:text="Name:" />
+                        android:layout_width="103dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:text="@string/name_colon" />
 
                     <TextView
                         android:id="@+id/card_user_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="68dp"
-                        android:layout_marginLeft="68dp"
-                        android:layout_marginTop="17dp"
-                        android:layout_marginEnd="59dp"
-                        android:layout_marginRight="59dp"
-                        android:layout_marginBottom="15dp"
-                        android:text="Jack Frost" />
+                        android:layout_width="116dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:text="" />
 
                 </LinearLayout>
 
@@ -76,21 +88,39 @@
 
                     <TextView
                         android:id="@+id/phone_number_card_lable"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="11dp"
-                        android:text="Phone Number:" />
+                        android:layout_width="103dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:text="@string/phone_number_colon" />
 
                     <TextView
                         android:id="@+id/card_user_phone_number"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="7dp"
-                        android:layout_marginLeft="7dp"
-                        android:layout_marginEnd="35dp"
-                        android:layout_marginRight="35dp"
-                        android:layout_marginBottom="8dp"
-                        android:text="925-555-5555" />
+                        android:layout_width="116dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:text="" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="103dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:text="@string/email_colon" />
+
+                    <TextView
+                        android:id="@+id/card_user_email"
+                        android:layout_width="116dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:text="" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -100,22 +130,16 @@
 
                     <TextView
                         android:id="@+id/status_card_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="23dp"
+                        android:layout_width="103dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
                         android:text="Status:" />
 
                     <TextView
                         android:id="@+id/card_user_status"
-                        android:layout_width="48dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="67dp"
-                        android:layout_marginLeft="67dp"
-                        android:layout_marginEnd="91dp"
-                        android:layout_marginRight="91dp"
-                        android:layout_marginBottom="18dp"
-                        android:text="Good"
-                        android:textColor="@android:color/holo_green_dark" />
+                        android:layout_width="116dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center" />
 
                 </LinearLayout>
 

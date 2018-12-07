@@ -17,6 +17,7 @@ class MainViewModel : ViewModel() {
     private val databaseManager = FirebaseDatabaseManager()
 
 
+
     fun getAllTextbooks(user_id : String, user_name: String?, user_email: String?, navigationView: NavigationView?) {
         if(!::user_account.isInitialized){
             user_account =  UserAccount(user_id, null,user_name,

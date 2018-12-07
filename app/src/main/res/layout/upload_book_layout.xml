@@ -5,14 +5,21 @@
     android:id="@+id/upload_book_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorAccent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/post_book_label"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/post_a_book_colon"
-        android:textAppearance="@android:style/TextAppearance.Large" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/post_book_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_a_book_colon"
+            android:textAppearance="@android:style/TextAppearance.Large" />
+    </LinearLayout>
 
     <android.support.v7.widget.CardView
         android:id="@+id/upload_image_card"
@@ -41,21 +48,20 @@
 
             <ImageView
                 android:id="@+id/user_image"
-                android:layout_width="88dp"
-                android:layout_height="88dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/ic_launcher_background"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/upload_image_label"
-                app:srcCompat="@mipmap/ic_launcher"
-                tools:ignore="VectorDrawableCompat" />
+                app:layout_constraintTop_toBottomOf="@+id/upload_image_label" />
 
             <Button
                 android:id="@+id/upload_image_button"
-                android:layout_width="wrap_content"
+                style="@style/CustomStyleButton"
+                android:layout_width="175dp"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/user_image"
                 android:layout_toStartOf="@+id/upload_image_label"
@@ -66,7 +72,8 @@
 
             <Button
                 android:id="@+id/upload_from_camera_button"
-                android:layout_width="wrap_content"
+                style="@style/CustomStyleButton"
+                android:layout_width="175dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/upload_image_button"
                 android:layout_alignStart="@+id/upload_image_button"
@@ -180,7 +187,7 @@
                 android:layout_weight="1"
                 android:autofillHints=""
                 android:ems="10"
-                android:hint="--------- Scoville"
+                android:hint="Professor Scovil"
                 android:inputType="textPersonName" />
 
         </LinearLayout>
@@ -192,13 +199,22 @@
 
             <Button
                 android:id="@+id/submit_book_button"
+                style="@style/CustomStyleButton"
                 android:layout_width="181dp"
                 android:layout_height="wrap_content"
                 android:text="@string/submit" />
 
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@color/btn_login_bg" />
+
             <Button
                 android:id="@+id/reset_book_details"
-                android:layout_width="match_parent"
+                style="@style/CustomStyleButton"
+                android:layout_width="181dp"
                 android:layout_height="wrap_content"
                 android:text="@string/reset" />
         </LinearLayout>

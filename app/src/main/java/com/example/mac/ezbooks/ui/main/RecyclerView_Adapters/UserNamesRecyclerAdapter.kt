@@ -38,11 +38,13 @@ class UserNamesRecyclerAdapter(val fragment: Fragment, private val booksViewMode
                if(buyerList!![position].approved){
                    booksViewModel.selected_selling.potential_buyers!![position].approved = false
                    buyerList!![position].approved = false
-                   itemView.card_view.setCardBackgroundColor(Color.RED)
+                   itemView.card_view.setCardBackgroundColor(fragment.context!!
+                           .resources.getColor(R.color.btn_logut_bg))
                }else{
                    booksViewModel.selected_selling.potential_buyers!![position].approved = true
                    buyerList!![position].approved = true
-                   itemView.card_view.setCardBackgroundColor(Color.GREEN)
+                   itemView.card_view.setCardBackgroundColor(fragment.context!!
+                           .resources.getColor(R.color.approved_book))
                }
                 databaseManager.toggleRequestApproval(booksViewModel, sText, buyerList!![position].approved, buyerList!![position])
 

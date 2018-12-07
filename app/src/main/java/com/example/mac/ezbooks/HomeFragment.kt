@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
         //Changes Title
-        activity?.title = "EZ-Books Home"
+        // activity?.title = "EZ-Books Home"
         //Creates the viewModel neccessary for maintaining the data.
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
@@ -57,7 +57,7 @@ class HomeFragment : Fragment() {
 
         view.home_card1.card_user_name.text = booksViewModel.user_account.user_name
         view.home_card1.card_user_phone_number.text = booksViewModel.user_account.phone_number
-
+        view.home_card1.card_user_email.text = booksViewModel.user_account.email_address
         if(booksViewModel.user_account.profile_img != null){
             var bitmap = BitmapFactory.
                     decodeByteArray(booksViewModel.user_account.profile_img,
@@ -69,7 +69,7 @@ class HomeFragment : Fragment() {
         when(booksViewModel.user_account.account_status){
             1 ->{
                 view.home_card1.card_user_status.text = "Good"
-                view.home_card1.card_user_status.setTextColor(resources.getColor(android.R.color.holo_green_light))
+                view.home_card1.card_user_status.setTextColor(resources.getColor(R.color.colorPrimaryDark))
             }
             0 ->{
                 view.home_card1.card_user_status.text = "Normal"
@@ -77,7 +77,7 @@ class HomeFragment : Fragment() {
             }
             else ->{
                 view.home_card1.card_user_status.text = "Bad"
-                view.home_card1.card_user_status.setTextColor(resources.getColor(android.R.color.holo_red_light))
+                view.home_card1.card_user_status.setTextColor(resources.getColor(R.color.colorAccent))
             }
 
         }
