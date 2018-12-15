@@ -27,7 +27,7 @@ class UserNamesRecyclerAdapter(val fragment: Fragment, private val booksViewMode
             sText = Searched_Textbooks(booksViewModel.user_account.user_id, textbook.book_id,
                     booksViewModel.user_account.user_name, textbook.affiliated_account?.email_address,
                     textbook.affiliated_account?.phone_number, textbook.Title, textbook.isbn,
-                    textbook.course, textbook.instructor, textbook.book_img, textbook.potential_buyers)
+                    textbook.course, textbook.instructor, textbook.potential_buyers)
             buyerList = booksViewModel.selected_selling.potential_buyers
 
 

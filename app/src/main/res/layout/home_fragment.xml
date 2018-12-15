@@ -43,7 +43,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:background="@drawable/image_border"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/blank_profile_picture_973460_640"
                 app:civ_border_color="@color/colorAccent"
                 app:civ_border_width="4dp"></de.hdodenhof.circleimageview.CircleImageView>
 
@@ -95,7 +95,7 @@
 
                     <TextView
                         android:id="@+id/card_user_phone_number"
-                        android:layout_width="116dp"
+                        android:layout_width="117dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:autoSizeTextType="uniform"
@@ -109,7 +109,7 @@
 
                     <TextView
                         android:layout_width="103dp"
-                        android:layout_height="25dp"
+                        android:layout_height="35dp"
                         android:layout_gravity="center"
                         android:text="@string/email_colon" />
 

@@ -2,11 +2,11 @@ package com.example.mac.ezbooks
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -19,12 +19,15 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.loginAccount.ChangePasswordFragment
 import com.example.mac.ezbooks.ui.main.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -61,6 +64,12 @@ class MainActivity : AppCompatActivity()  {
     private val KEY_BUYER_NAME = "buyer_name"
     private val KEY_BUYER_APPROVAL = "buyer_approval"
     private val database = FirebaseDatabase.getInstance()
+    private val TEXTBOOK_IMG_HEADER = "images/textbooks/"
+    private val ACCOUNT_IMG_HEADER = "images/accounts/"
+    private val storage = FirebaseStorage.getInstance()
+    var storageRef = storage.getReference()
+
+
 
     //This is for fragments!!!!!
     private lateinit var mainDrawerLayout: DrawerLayout
@@ -107,10 +116,6 @@ class MainActivity : AppCompatActivity()  {
                     val user_phone = textbook.child(KEY_PHONE).getValue(String::class.java)
                     val potential_Buyer: MutableList<Potential_Buyer> = mutableListOf()
                     val book_img_string = textbook.child(KEY_BOOK_IMG).getValue(String::class.java)
-                    var book_img: ByteArray? = null
-                    if (book_img_string != null) {
-                        book_img = Base64.decode(book_img_string, Base64.DEFAULT)
-                    }
 
                     val buyers_iter = textbook.child(KEY_POTENTIAL_BUYERS).children
                     for (buyer in buyers_iter) {
@@ -127,7 +132,7 @@ class MainActivity : AppCompatActivity()  {
                         }
                     }
                     booksViewModel.requested_textbooks.add(Searched_Textbooks(userid, bookid, user_name, user_email, user_phone, title, isbn,
-                            course, instructor, book_img, potential_Buyer))
+                            course, instructor, potential_Buyer))
                     Log.i("Eeron Size: ", potential_Buyer.size.toString())
                 }
             }
@@ -141,28 +146,14 @@ class MainActivity : AppCompatActivity()  {
                 booksViewModel.recent_requested_Textbooks.addAll(booksViewModel.requested_textbooks)
             }
 
-            //Set up Navigation Header//////////////////////////////////////////////////////////
-            navigationView.getHeaderView(0).
-                    findViewById<TextView>(R.id.user_header_name)
-                    .text = booksViewModel.user_account.user_name
-
-            if(booksViewModel.user_account.profile_img != null){
-                var bitmap = BitmapFactory.
-                        decodeByteArray(booksViewModel.user_account.profile_img,
-                                0, booksViewModel.user_account.profile_img!!.size)
-
-                navigationView.getHeaderView(0).
-                        findViewById<ImageView>(R.id.user_header_image).setImageBitmap(bitmap)
-            }
-            ////////////////////////////////////////////////////////////////////////////////////
 
             //Update fragments or create a homefragment if new//////////////////////////////////
-            if (supportFragmentManager.findFragmentById(R.id.flContent) == null) {
-                val menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
-                navigationView.setCheckedItem(menuItem)
-                supportFragmentManager.beginTransaction().replace(R.id.flContent,
-                        HomeFragment(),"homeFrag").addToBackStack("homeFrag").commitAllowingStateLoss()
-            } else {
+            if (supportFragmentManager.findFragmentById(R.id.flContent) != null) {
+                //val menuItem = navigationView.menu.getItem(0).subMenu.getItem(0)
+                //navigationView.setCheckedItem(menuItem)
+                //supportFragmentManager.beginTransaction().replace(R.id.flContent,
+              //          HomeFragment(),"homeFrag").addToBackStack("homeFrag").commitAllowingStateLoss()
+            //} else {
 
                 val fragment = supportFragmentManager.findFragmentById(R.id.flContent)
                 val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -216,7 +207,7 @@ class MainActivity : AppCompatActivity()  {
 
                 var aTextbook : Textbooks?
                 if(title != null && isbn != null){
-                    aTextbook = Textbooks( bookid, title, isbn, book_img, instructor, course,
+                    aTextbook = Textbooks( bookid, title, isbn, instructor, course,
                             booksViewModel.user_account, potential_buyers)
                     booksViewModel.selling_textbooks.add(aTextbook)
                 }
@@ -250,10 +241,10 @@ class MainActivity : AppCompatActivity()  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         val mAuth = FirebaseAuth.getInstance()
         mUser = mAuth!!.currentUser
         databaseManager = FirebaseDatabaseManager()
+
         //This sets up the layout for the items in the drawer
         mainDrawerLayout = findViewById(R.id.drawer_layout)
 
@@ -261,6 +252,15 @@ class MainActivity : AppCompatActivity()  {
         booksViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         navigationView = nav_view
         booksViewModel.getAllTextbooks(mUser!!.uid, mUser!!.displayName, mUser!!.email, navigationView)
+
+
+        navigationView.getHeaderView(0).
+                findViewById<TextView>(R.id.user_header_name)
+                .text = booksViewModel.user_account.user_name
+
+        databaseManager.getAccountImg(mAuth.uid!!, navigationView.getHeaderView(0)?.
+                findViewById(R.id.user_header_image)!!)
+
 
         //Sets up the navigation menu from main Drawer
         navigationView.setNavigationItemSelectedListener { menuItem ->
@@ -361,6 +361,7 @@ class MainActivity : AppCompatActivity()  {
 
         var fragment = supportFragmentManager.findFragmentById(R.id.flContent)
         var fragmentName : String? = ""
+        var createdFrag : Fragment? = null
         if(fragment != null) {
             fragmentName = fragment.tag
         }
@@ -369,47 +370,88 @@ class MainActivity : AppCompatActivity()  {
 
             R.id.nav_edit_credentials->{
                 if(fragmentName != "editAccount") {
+                    createdFrag = supportFragmentManager.findFragmentByTag("editAccount")
+                    if(createdFrag != null){
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                createdFrag).addToBackStack("editAccount").commit()
+                    }else{
                     supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
                             R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
                             EditAccountFragment(),"editAccount").addToBackStack("editAccount").commit()
+                    }
                 }
             }
             R.id.nav_add_listing->{
                 if(fragmentName != "uploadBook") {
+                    createdFrag = supportFragmentManager.findFragmentByTag("uploadBook")
+                    if(createdFrag != null){
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                createdFrag).addToBackStack("uploadBook").commit()
+                    }else{
                     supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in,
                             R.anim.abc_fade_out, R.anim.abc_fade_in, R.anim.abc_fade_out).
                             replace(R.id.flContent,
                             UploadBookFragment(),"uploadBook").addToBackStack("uploadBook").commit()
+                    }
                 }
             }
             R.id.nav_requested_books->{
                 if(fragmentName != "requestedBook") {
-                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
-                            R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
-                            RequestedBooksFragment(),"requestedBooks").addToBackStack("requestedBooks").commit()
+                    createdFrag = supportFragmentManager.findFragmentByTag("requestedBook")
+                    if(createdFrag != null){
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                createdFrag).addToBackStack("requestedBook").commit()
+                    }else {
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                RequestedBooksFragment(), "requestedBooks").addToBackStack("requestedBooks").commit()
+                    }
                 }
             }
             R.id.nav_books_you_sell->{
                 if(fragmentName != "booksforSale") {
-                    supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in,
-                            R.anim.abc_fade_out, R.anim.abc_fade_in, R.anim.abc_fade_out).
-                            replace(R.id.flContent,
-                            BooksForSaleFragment(),"booksforSale").addToBackStack("booksforSale").commit()
+                    createdFrag = supportFragmentManager.findFragmentByTag("booksforSale")
+                    if(createdFrag != null){
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                createdFrag).addToBackStack("booksforSale").commit()
+                    }else {
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in,
+                                R.anim.abc_fade_out, R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                BooksForSaleFragment(), "booksforSale").addToBackStack("booksforSale").commit()
+                    }
                 }
             }
             R.id.nav_search_shop->{
                 if(fragmentName != "searchShop") {
+                    createdFrag = supportFragmentManager.findFragmentByTag("searchShop")
+                    if(createdFrag != null){
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                createdFrag).addToBackStack("searchShop").commit()
+                    }else {
                     supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
                             R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
                             SearchFragment(),"searchShop").addToBackStack("searchShop").commit()
+                    }
                 }
 
             }
             R.id.nav_change_password->{
                 if(fragmentName != "changePassword") {
+                    createdFrag = supportFragmentManager.findFragmentByTag("changePassword")
+                    if(createdFrag != null){
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                createdFrag).addToBackStack("changePassword").commit()
+                    }else {
                     supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
                             R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
                             ChangePasswordFragment(),"changePassword").addToBackStack("changePassword").commit()
+                    }
                 }
             }
             R.id.nav_sign_out->{
@@ -421,8 +463,15 @@ class MainActivity : AppCompatActivity()  {
             }
             else -> {
                 if(fragmentName != "homeFrag") {
-                    supportFragmentManager.beginTransaction().replace(R.id.flContent,
-                            HomeFragment(),"homeFrag").addToBackStack("homeFrag").commit()
+                    createdFrag = supportFragmentManager.findFragmentByTag("homeFrag")
+                    if(createdFrag != null){
+                        supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out,
+                                R.anim.abc_fade_in, R.anim.abc_fade_out).replace(R.id.flContent,
+                                createdFrag).addToBackStack("homeFrag").commit()
+                    }else {
+                        supportFragmentManager.beginTransaction().replace(R.id.flContent,
+                                HomeFragment(), "homeFrag").addToBackStack("homeFrag").commit()
+                    }
                 }
 
 

@@ -27,10 +27,10 @@ class SellingBookDetailFragment : Fragment() {
     lateinit var image: ImageView
     private lateinit var booksViewModel: MainViewModel
     private var RECENTS_SIZE = 5
-    private lateinit var database : FirebaseDatabase
 
 
-    private lateinit var databaseManager: FirebaseDatabaseManager
+    private var databaseManager = FirebaseDatabaseManager()
+
     private lateinit var UserNameslayoutManager: RecyclerView.LayoutManager
     private lateinit var UserNamesadapter: RecyclerView.Adapter<UserNamesRecyclerAdapter.ViewHolder>
     private lateinit var UserNamesRecyclerview : RecyclerView
@@ -38,12 +38,11 @@ class SellingBookDetailFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.detail_selling_books_layout, container, false)
 
-        database = FirebaseDatabase.getInstance()
-
-
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
+
+        val selectedTextbook = booksViewModel.selected_selling
 
         //Set up information
         view.detail_selling_book_title.text = booksViewModel.selected_selling.Title
@@ -51,11 +50,8 @@ class SellingBookDetailFragment : Fragment() {
         view.detail_selling_book_course.text = booksViewModel.selected_selling.course
         view.detail_selling_book_instructor.text = booksViewModel.selected_selling.instructor
 
-        if(booksViewModel.selected_selling.book_img != null) {
-            val bitmap = BitmapFactory.decodeByteArray(booksViewModel.selected_selling.book_img,
-                    0, booksViewModel.selected_selling.book_img!!.size)
-            view.detail_selling_book_image.setImageBitmap(bitmap)
-        }
+        databaseManager.getTextbookImg(selectedTextbook.book_id.toString(), selectedTextbook.affiliated_account?.user_id!!,
+                view.detail_selling_book_image)
 
         view.edit_listing_button.setOnClickListener{
             activity?.supportFragmentManager?.beginTransaction()?.
@@ -79,7 +75,7 @@ class SellingBookDetailFragment : Fragment() {
             val sText = Searched_Textbooks(booksViewModel.user_account.user_id, textbook.book_id,
                     booksViewModel.user_account.user_name, booksViewModel.user_account.email_address,
                     booksViewModel.user_account.phone_number, textbook.Title, textbook.isbn,
-                    textbook.course, textbook.instructor, textbook.book_img, textbook.potential_buyers)
+                    textbook.course, textbook.instructor, textbook.potential_buyers)
 
             databaseManager.removeTextbook(sText)
 
@@ -114,4 +110,5 @@ class SellingBookDetailFragment : Fragment() {
         UserNamesRecyclerview.layoutManager = UserNameslayoutManager
 
     }
+
 }

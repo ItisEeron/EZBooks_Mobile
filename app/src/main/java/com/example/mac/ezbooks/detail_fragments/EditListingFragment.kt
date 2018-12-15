@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.NavigationView
@@ -13,11 +14,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
 import com.example.mac.ezbooks.ui.main.MainViewModel
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.upload_book_layout.*
 import kotlinx.android.synthetic.main.upload_book_layout.view.*
 import java.io.ByteArrayOutputStream
@@ -30,9 +33,10 @@ class EditListingFragment : Fragment() {
     private var pendingUpload: ByteArray? = null
     private var imageHandler : ImageHandler = ImageHandler()
     private val databaseManager = FirebaseDatabaseManager()
-
+    private var selectedImage : Uri? = null
     val GET_FROM_GALLERY = 3
     val REQUEST_IMAGE_CAPTURE = 1
+    private lateinit var bookImage : ImageView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.upload_book_layout, container, false)
@@ -42,6 +46,8 @@ class EditListingFragment : Fragment() {
         }
                 ?: throw Exception("Invalid Activity")
 
+        val selectedTextbook = booksViewModel.selected_selling
+        bookImage = view.user_image
         view.post_book_label.text = "Edit a Book:"
         view.submit_book_button.text = "Submit Edits"
 
@@ -62,10 +68,11 @@ class EditListingFragment : Fragment() {
                 booksViewModel.selected_selling.instructor = book_instructor_editText.text.toString()
             }//if
 
-            if(pendingUpload != null)
-                    booksViewModel.selected_selling.book_img = pendingUpload
+            databaseManager.getTextbookImg(selectedTextbook.book_id.toString(), selectedTextbook.affiliated_account?.user_id!!,
+                    bookImage)
 
-            databaseManager.createTextbook(booksViewModel.user_account,booksViewModel.selected_selling)
+            databaseManager.createTextbook(booksViewModel.user_account,booksViewModel.selected_selling,
+                    selectedImage)
 
             //Navigate back home
             fragmentManager?.popBackStack()
@@ -128,24 +135,30 @@ class EditListingFragment : Fragment() {
             when (requestCode) {
                 GET_FROM_GALLERY -> {
 
-                    var selectedImage = data?.getData()
                     try {
-                        var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
+                        selectedImage = data?.getData()
+                        Picasso.with(this.context).load(selectedImage).into(bookImage)
+                        /*var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
                                 ?.getContentResolver(), selectedImage)
                         user_image.setImageBitmap(bitmap)
                         var stream = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
                         pendingUpload = stream.toByteArray()
+                        */
 
                     } catch (e: IOException) {
                         Log.i("TAG", "Some exception " + e)
                     }
                 }
                 REQUEST_IMAGE_CAPTURE ->{
-                    val imageBitmap = data?.extras?.get("data") as? Bitmap
+                    selectedImage = data?.extras?.get("data") as? Uri
+                    Picasso.with(this.context).load(selectedImage).into(bookImage)
+
+                    /*val imageBitmap = data?.extras?.get("data") as? Bitmap
 
                     pendingUpload = imageHandler.setPic(user_image, mCurrentPhotoPath)
                     imageHandler.galleryAddPic(this.activity!! , mCurrentPhotoPath)
+                    */
                 }
 
             }

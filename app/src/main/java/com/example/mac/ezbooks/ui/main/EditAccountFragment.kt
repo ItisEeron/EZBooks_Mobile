@@ -16,10 +16,13 @@ import kotlinx.android.synthetic.main.edit_user_account_layout.view.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
+import com.bumptech.glide.Glide
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
+import com.squareup.picasso.Picasso
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
@@ -32,13 +35,9 @@ class EditAccountFragment : Fragment(){
     private var imageHandler : ImageHandler = ImageHandler()
     val GET_FROM_GALLERY = 3
     val REQUEST_IMAGE_CAPTURE = 1
+    private var selectedImage : Uri? = null
+    val databaseManager : FirebaseDatabaseManager = FirebaseDatabaseManager()
 
-
-    override fun onCreate(savedInstanceState : Bundle?) {
-        //Super allows the original function to execute then you add your own code
-        super.onCreate(savedInstanceState)
-        //activity?.title = "Edit Your Account"
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.edit_user_account_layout, container, false)
@@ -47,21 +46,10 @@ class EditAccountFragment : Fragment(){
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
 
-        if(pendingUpload != null){
-            val bitmap = BitmapFactory.decodeByteArray(pendingUpload, 0, pendingUpload!!.size)
-            view.user_account_Image.setImageBitmap(bitmap)
-        }
-
         main_account = ezbooksViewModel.user_account
 
         //Present User Account image as the uploaded image for this page
-        if(main_account.profile_img != null && pendingUpload == null){
-            var bitmap = BitmapFactory.
-                    decodeByteArray(main_account.profile_img,
-                            0, main_account!!.profile_img!!.size)
-            (view.user_account_Image as ImageView).setImageBitmap(bitmap)
-        }
-
+        databaseManager.getAccountImg(main_account.user_id.toString(), view.user_account_Image)
 
         view.submit_account_changes_button.setOnClickListener{
             val fragmentManager = activity?.supportFragmentManager
@@ -79,11 +67,7 @@ class EditAccountFragment : Fragment(){
             main_account.class_standing = if(view.class_standing_editText.text.toString().isBlank())
                 main_account.class_standing else view.class_standing_editText.text.toString()
 
-
-            if(pendingUpload != null )
-                main_account.profile_img = pendingUpload
-
-            FirebaseDatabaseManager().updateAccount(main_account)
+            databaseManager.updateAccount(main_account, selectedImage)
 
             fragmentManager?.popBackStack()
             //Task to keep the home page labels intact
@@ -99,15 +83,7 @@ class EditAccountFragment : Fragment(){
             view.class_standing_editText.text.clear()
             pendingUpload = null
 
-            if(ezbooksViewModel.user_account.profile_img != null){
-                var bitmap = BitmapFactory.
-                        decodeByteArray(ezbooksViewModel.user_account.profile_img,
-                                0, ezbooksViewModel!!.user_account!!.profile_img!!.size)
-                view.user_account_Image.setImageBitmap(bitmap)
-            }
-            else{
-                view.user_account_Image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
-            }
+            databaseManager.getAccountImg(main_account.user_id.toString(), view.user_account_Image)
         }
 
         view.upload_image_button.setOnClickListener{
@@ -135,24 +111,34 @@ class EditAccountFragment : Fragment(){
             when (requestCode) {
                 GET_FROM_GALLERY -> {
 
-                    var selectedImage = data?.getData()
                     try {
+                        selectedImage = data?.getData()
+                        Picasso.with(this.context!!).load(selectedImage).into(this.user_account_Image)
+                        /*
                         var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
                                 ?.getContentResolver(), selectedImage)
                         user_account_Image.setImageBitmap(bitmap)
                         var stream = ByteArrayOutputStream()
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream)
                         pendingUpload = stream.toByteArray()
+                        */
 
                     } catch (e: IOException) {
                         Log.i("TAG", "Some exception " + e)
                     }
                 }
                 REQUEST_IMAGE_CAPTURE ->{
+                    selectedImage = data?.extras?.get("data") as Uri
+                    Picasso.with(this.context!!).load(selectedImage).into(this.user_account_Image)
+                    /*
                     val imageBitmap = data?.extras?.get("data") as? Bitmap
-
-                    pendingUpload = imageHandler.setPic(user_account_Image, mCurrentPhotoPath )
-                    imageHandler.galleryAddPic(this.activity!!,mCurrentPhotoPath)
+                    user_account_Image.setImageBitmap(imageBitmap)
+                    var stream = ByteArrayOutputStream()
+                    imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 20, stream)
+                    //imageHandler.setPic(user_account_Image, mCurrentPhotoPath)
+                    //imageHandler.galleryAddPic(this.activity!!, mCurrentPhotoPath )
+                    pendingUpload = stream.toByteArray()
+                    */
                 }
 
             }

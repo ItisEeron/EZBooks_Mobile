@@ -20,12 +20,6 @@ class BooksForSaleFragment : Fragment() {
     private lateinit var uploadedBooksadapter: RecyclerView.Adapter<UploadBooksRecyclerAdapter.ViewHolder>
     private lateinit var uploadedBooksRecyclerview : RecyclerView
 
-    override fun onCreate(savedInstanceState : Bundle?) {
-        //Super allows the original function to execute then you add your own code
-        super.onCreate(savedInstanceState)
-        //activity?.title = "Uploaded Textbook Listing"
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.books_for_sale_layout, container, false)
 

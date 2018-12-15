@@ -18,6 +18,7 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
@@ -172,7 +173,7 @@ class SearchFragment :  Fragment() {
                             instructor!!.toLowerCase().contains(searchString.toLowerCase())) {
                         if(exit == false) {
                             searchedQuery?.add(Searched_Textbooks(userid, bookid, user_name, user_email, user_phone, title, isbn,
-                                    course, instructor, book_img, potential_Buyer))
+                                    course, instructor, potential_Buyer))
                             counter++
                         }
 

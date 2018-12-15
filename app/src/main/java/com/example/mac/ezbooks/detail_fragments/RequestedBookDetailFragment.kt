@@ -22,6 +22,8 @@ class RequestedBookDetailFragment : Fragment() {
     private lateinit var textbook: Searched_Textbooks
     private var RECENTS_SIZE = 5
     private var MIN_SIZE = 0
+    val databaseManager : FirebaseDatabaseManager = FirebaseDatabaseManager()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.detail_requested_books_layout, container, false)
@@ -30,17 +32,16 @@ class RequestedBookDetailFragment : Fragment() {
             ViewModelProviders.of(this).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
+        val selectedTextbook = booksViewModel.selected_requested
+
         //Set up information
         view.detail_requested_book_title.text = booksViewModel.selected_requested.title
         view.detail_requested_book_isbn.text = booksViewModel.selected_requested.isbn
         view.detail_requested_book_course.text = booksViewModel.selected_requested.course
         view.detail_requested_book_instructor.text = booksViewModel.selected_requested.instructor
 
-        if(booksViewModel.selected_requested.book_img != null) {
-            var bitmap = BitmapFactory.decodeByteArray(booksViewModel.selected_requested.book_img,
-                    0, booksViewModel.selected_requested.book_img!!.size)
-            view.detail_requested_book_image.setImageBitmap(bitmap)
-        }
+        databaseManager.getTextbookImg(selectedTextbook.bookid.toString(), selectedTextbook.userid!!,
+                view.detail_requested_book_image)
 
         view.detail_requested_book_seller.text = booksViewModel.selected_requested.user_name
 

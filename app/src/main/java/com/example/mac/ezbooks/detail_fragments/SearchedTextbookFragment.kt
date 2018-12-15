@@ -38,11 +38,8 @@ class SearchedTextbookFragment : Fragment() {
         view.detail_requested_book_instructor.text = textbook.instructor
         view.detail_requested_book_seller.text = textbook.user_name
 
-        if(textbook.book_img != null) {
-            var bitmap = BitmapFactory.decodeByteArray(textbook.book_img,
-                    0, textbook.book_img!!.size)
-            view.detail_requested_book_image.setImageBitmap(bitmap)
-        }
+        databaseManager.getTextbookImg(textbook.bookid.toString(), textbook.userid!!,
+                view.detail_requested_book_image)
 
         //First check to see if the selected list of buyers is null (it should not!!)
         var isAproved = false
@@ -72,9 +69,14 @@ class SearchedTextbookFragment : Fragment() {
         }
 
         view.edit_button.setOnClickListener{
+
+            val b = Bundle()
+            b.putSerializable("textbook", textbook)
+            var newFragment = ReportUserFragment()
+            newFragment.arguments = b
             activity?.supportFragmentManager?.beginTransaction()?.
                     setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                    ReportUserFragment())?.addToBackStack(null)?.commit()
+                    newFragment)?.addToBackStack(null)?.commit()
 
         }
 
