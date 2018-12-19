@@ -12,6 +12,7 @@ import android.widget.TextView
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.detail_fragments.SearchedTextbookFragment
 import android.os.Bundle
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
 
 
@@ -19,6 +20,7 @@ class SearchAdapter (fragment : Fragment, searchedQuery : ArrayList<Searched_Tex
 
     var fragment: Fragment? = null
     var searchedQuery : ArrayList<Searched_Textbooks> = ArrayList()
+    var databaseManager = FirebaseDatabaseManager()
 
     init{
         this.fragment = fragment
@@ -29,23 +31,30 @@ class SearchAdapter (fragment : Fragment, searchedQuery : ArrayList<Searched_Tex
         var itemImage: ImageView
         var itemTitle: TextView
         var itemCourse: TextView
-        //var itemInstructor : TextView
 
         init {
             itemImage = itemView.findViewById(R.id.searched_Image)
             itemTitle = itemView.findViewById(R.id.searched_Title)
             itemCourse = itemView.findViewById(R.id.searched_Course)
-            //itemInstructor  = itemView.findViewById(R.id.item_account)
 
             itemView.setOnClickListener{view ->
                 var position: Int = adapterPosition
                 val b = Bundle()
                 b.putSerializable("textbook", searchedQuery[position])
-                var newFragment = SearchedTextbookFragment()
-                newFragment.arguments = b
+                b.putInt("position",position)
+
+                var TAG = searchedQuery[position].userid + searchedQuery[position].bookid.toString() +
+                        "_detail"
+
+                //Prevents fragment from being recreated multiple times
+                var newFragment = fragment?.activity?.supportFragmentManager?.findFragmentByTag(TAG)
+                if(newFragment == null) {
+                    newFragment = SearchedTextbookFragment()
+                    newFragment.arguments = b
+                }
                 fragment?.fragmentManager?.beginTransaction()?.
                         setCustomAnimations(R.anim.design_snackbar_in, R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                        newFragment)?.addToBackStack("search_Detail")?.commit()
+                        newFragment, TAG)?.addToBackStack(TAG)?.commit()
             }
         }
     }
@@ -57,18 +66,13 @@ class SearchAdapter (fragment : Fragment, searchedQuery : ArrayList<Searched_Tex
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, i: Int) {
-        //viewHolder.itemInstructor.text = instructorList[i]
         viewHolder.itemTitle.text = searchedQuery[i].title
         viewHolder.itemCourse.text = searchedQuery[i].course
+        viewHolder.itemImage.setImageResource(R.drawable.android_image_5)
 
-        if(searchedQuery[i].book_img != null) {
-            var bitmap = BitmapFactory.decodeByteArray(searchedQuery[i].book_img,
-                        0, searchedQuery[i].book_img!!.size)
-            viewHolder.itemImage.setImageBitmap(bitmap)
+        databaseManager.getTextbookImg(searchedQuery[i].bookid.toString(),searchedQuery[i].userid!!,
+                viewHolder.itemImage)
 
-        } else {
-            viewHolder.itemImage.setImageResource(R.drawable.android_image_5)
-        }
     }
 
     override fun getItemCount(): Int {

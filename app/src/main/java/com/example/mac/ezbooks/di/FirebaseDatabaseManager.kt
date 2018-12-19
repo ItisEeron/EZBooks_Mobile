@@ -1,20 +1,38 @@
 package com.example.mac.ezbooks.di
 
-import android.app.Activity
+import android.content.ContentResolver
+import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.provider.MediaStore
 import android.support.design.widget.NavigationView
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.util.Base64
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.GlideBuilder
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.module.AppGlideModule
+import com.bumptech.glide.request.Request
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.ui.main.*
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 
 
-class FirebaseDatabaseManager (){
+class FirebaseDatabaseManager{
     private val KEY_ACCOUNT = "account"
     private val KEY_TEXTBOOK_REF = "textbook_ref"
     private val KEY_TEXTBOOK = "textbook"
@@ -24,7 +42,6 @@ class FirebaseDatabaseManager (){
     private val KEY_NAME = "name"
     private val KEY_ID = "id"
     private val KEY_PHONE = "phone_number"
-    private val KEY_PROF = "profile_img"
     private val KEY_REQ_BOOKS = "req_books"
     private val KEY_OTHERS_LOG = "others_log"
     private val KEY_BOOK_ID = "book_id"
@@ -32,28 +49,34 @@ class FirebaseDatabaseManager (){
     private val KEY_ISBN = "isbn"
     private val KEY_INSTRUCTOR = "instructor"
     private val KEY_COURSE = "course"
-    private val KEY_BOOK_IMG = "book_img"
     private val KEY_POTENTIAL_BUYERS = "potential_buyers"
     private val KEY_BUYER_ID = "buyer_id"
     private val KEY_BUYER_NAME = "buyer_name"
     private val KEY_BUYER_APPROVAL = "buyer_approval"
 
-
+    private val TEXTBOOK_IMG_HEADER = "images/textbooks/"
+    private val ACCOUNT_IMG_HEADER = "images/accounts/"
 
     private val database = FirebaseDatabase.getInstance()
+    private val storage = FirebaseStorage.getInstance()
 
+    @GlideModule class MyAppGlideModule : AppGlideModule(){
+        override fun applyOptions(context: Context, builder: GlideBuilder) {
+            builder.setDefaultRequestOptions(RequestOptions().format(DecodeFormat.PREFER_ARGB_8888))
+        }
+    }
 
     fun createUser(id: String, name: String, email: String) {
         val myRef = database.getReference(KEY_ACCOUNT)
         myRef.child(id).child(KEY_ID).setValue(id)
         myRef.child(id).child(KEY_NAME).setValue(name)
         myRef.child(id).child(KEY_EMAIL).setValue(email)
-
     }
 
-    fun createTextbook(user_account: UserAccount, textbook: Textbooks) {
+    fun createTextbook(user_account: UserAccount, textbook: Textbooks, selectedImage : Uri?) {
         val book_id = textbook.book_id.toString()
         var myRef = database.getReference(KEY_ACCOUNT).child(user_account.user_id!!).child(KEY_TEXTBOOK)
+        var storageRef = storage.getReference()
         myRef.child(book_id).child(KEY_BOOK_ID).setValue(textbook.book_id)
         myRef.child(book_id).child(KEY_TITLE).setValue(textbook.Title)
         myRef.child(book_id).child(KEY_ISBN).setValue(textbook.isbn)
@@ -61,13 +84,12 @@ class FirebaseDatabaseManager (){
         myRef.child(book_id).child(KEY_COURSE).setValue(textbook.course)
 
 
+        var imageRef = storageRef.child(TEXTBOOK_IMG_HEADER+user_account.user_id+textbook.book_id)
 
-        //convert book_img into something readable by firebase
-        var book_img : String? = null
-        if(textbook.book_img != null) {
-            book_img = Base64.encodeToString(textbook.book_img, Base64.NO_WRAP)
+        //starting upload
+        if(selectedImage != null) {
+            imageRef.putFile(selectedImage)
         }
-        myRef.child(book_id).child(KEY_BOOK_IMG).setValue(book_img)
 
         //Now create the reference for searching purposes
         myRef = database.getReference(KEY_TEXTBOOK_REF)
@@ -78,15 +100,13 @@ class FirebaseDatabaseManager (){
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_ISBN).setValue(textbook.isbn)
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_INSTRUCTOR).setValue(textbook.instructor)
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_COURSE).setValue(textbook.course)
-        myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_BOOK_IMG).setValue(book_img)
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_EMAIL).setValue(user_account.email_address)
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_PHONE).setValue(user_account.phone_number)
-
-
     }
 
-    fun updateAccount(account : UserAccount){
+    fun updateAccount(account : UserAccount, selectedImage: Uri?){
         val myRef = database.getReference(KEY_ACCOUNT)
+        var storageRef = storage.getReference()
         myRef.child(account.user_id.toString())
                 .child(KEY_NAME).setValue(account.user_name)
         myRef.child(account.user_id.toString())
@@ -96,17 +116,17 @@ class FirebaseDatabaseManager (){
         myRef.child(account.user_id.toString())
                 .child(KEY_PHONE).setValue(account.phone_number)
 
-        //convert profile_image into something readable by firebase
-        if(account.profile_img != null ) {
-            val prof_image = Base64.encodeToString(account.profile_img, Base64.NO_WRAP)
-            myRef.child(account.user_id.toString())
-                    .child(KEY_PROF).setValue(prof_image)
-        }
+        var imageRef = storageRef.child(ACCOUNT_IMG_HEADER+account.user_id)
+        if(selectedImage != null)
+            imageRef.putFile(selectedImage)
     }
 
     fun removeTextbook(textbook: Searched_Textbooks){
         var myRef = database.getReference(KEY_ACCOUNT).child(textbook.userid.toString()).child(KEY_TEXTBOOK)
                 .child(textbook.bookid.toString())
+        var storageRef = storage.getReference(TEXTBOOK_IMG_HEADER+textbook.userid+textbook.bookid)
+
+        storageRef.delete()
         myRef.removeValue()
 
         myRef = database.getReference(KEY_TEXTBOOK_REF).child(textbook.userid.toString() + textbook.userid.toString())
@@ -116,6 +136,8 @@ class FirebaseDatabaseManager (){
     //Read from database
     fun retrieveAccount(id : String , viewModel: MainViewModel, navigationView: NavigationView?){
         val myRef = database.getReference(KEY_ACCOUNT)
+        var storageRef = storage.getReference()
+
         myRef.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 println(p0.message)
@@ -129,195 +151,18 @@ class FirebaseDatabaseManager (){
                         findViewById<TextView>(R.id.user_header_name)
                         ?.text = viewModel.user_account.user_name
 
-                if(viewModel.user_account.profile_img != null){
-                    var bitmap = BitmapFactory.
-                            decodeByteArray(viewModel.user_account.profile_img,
-                                    0, viewModel.user_account.profile_img!!.size)
-
-                    navigationView?.getHeaderView(0)?.
-                            findViewById<ImageView>(R.id.user_header_image)?.setImageBitmap(bitmap)
+                var load = storageRef.child(ACCOUNT_IMG_HEADER+id)
+                load.downloadUrl.addOnSuccessListener {
+                    Picasso.get().load(it.toString()).into(navigationView?.getHeaderView(0)?.
+                            findViewById<ImageView>(R.id.user_header_image))
+                }.addOnFailureListener {
+                    Toast.makeText(navigationView?.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
                 }
-                ////////////////////////////////////////////////////////////////////////////////////
-
             }
+            ////////////////////////////////////////////////////////////////////////////////////
         })
 
     }
-
-    /*
-    fun retrieveRequestedTextbookList(user_id: String,viewModel: MainViewModel, fragment:Fragment?){
-        var myRef = database.getReference(KEY_ACCOUNT)
-                .child(user_id).child(KEY_REQ_BOOKS)
-
-        myRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var requested_book_ids : ArrayList<String> = arrayListOf()
-                var id_iter = snapshot.children
-                viewModel.recent_requested_Textbooks.clear()
-                viewModel.requested_textbooks.clear()
-                for (textbook in id_iter){
-                   requested_book_ids.add(textbook.key!!)
-                }
-                var newRef = database.getReference(KEY_TEXTBOOK_REF)
-                newRef.addListenerForSingleValueEvent(object : ValueEventListener{
-                    override fun onCancelled(p0: DatabaseError) {
-                    }
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        var textbook_iter = snapshot.children
-                        for(textbook in textbook_iter){
-                            if(requested_book_ids.contains(textbook.key)){
-                                val userid = textbook.child(KEY_ACCOUNT).value as String
-                                val bookid = textbook.child(KEY_BOOK_ID).value as Long
-                                val user_name = textbook.child(KEY_NAME).getValue(String::class.java)
-                                val title = textbook.child(KEY_TITLE).getValue(String::class.java)
-                                val isbn = textbook.child(KEY_ISBN).getValue(String::class.java)
-                                val course = textbook.child(KEY_COURSE).getValue(String::class.java)
-                                val instructor = textbook.child(KEY_INSTRUCTOR).getValue(String::class.java)
-                                val user_email = textbook.child(KEY_EMAIL).getValue(String::class.java)
-                                val user_phone = textbook.child(KEY_PHONE).getValue(String::class.java)
-                                var potential_Buyer : MutableList<Potential_Buyer> = mutableListOf()
-                                val book_img_string = textbook.child(KEY_BOOK_IMG).getValue(String::class.java)
-                                var book_img : ByteArray? = null
-                                if(book_img_string != null){
-                                    book_img = Base64.decode(book_img_string, Base64.DEFAULT)
-                                }
-
-                                val buyers_iter = textbook.child(KEY_POTENTIAL_BUYERS).children
-                                for (buyer in buyers_iter) {
-                                    if(buyer != null) {
-                                        var buyerName: String?
-                                        var buyerID: String?
-                                        var buyerApproval: Boolean = false
-
-                                        buyerID = buyer.child(KEY_BUYER_ID).value as String
-                                        buyerName = buyer.child(KEY_BUYER_NAME).value as String
-                                        buyerApproval = buyer.child(KEY_BUYER_APPROVAL).value as Boolean
-
-                                        potential_Buyer.add(Potential_Buyer(buyerID!!, buyerName!!, buyerApproval!!))
-                                    }
-                                }
-                                viewModel.requested_textbooks.add(Searched_Textbooks(userid, bookid, user_name, user_email, user_phone,title, isbn,
-                                        course, instructor, book_img, potential_Buyer))
-                                Log.i("Eeron Size: " , potential_Buyer.size.toString())
-                            }
-                        }
-
-                        viewModel.requested_textbooks.reverse()
-
-                        if(viewModel.requested_textbooks.size > 5) {
-                            viewModel.recent_requested_Textbooks.addAll(viewModel.requested_textbooks
-                                    .subList(0, 5))
-                        }
-                        else {
-                            viewModel.recent_requested_Textbooks.addAll(viewModel.requested_textbooks)
-                        }
-
-                        if (fragment != null) {
-                            //recyclerAdapter!!.notifyDataSetChanged()
-                            var ft: FragmentTransaction = fragment.activity!!.supportFragmentManager.beginTransaction()
-                            ft.detach(fragment)
-                            ft.attach(fragment)
-                            ft.commit()
-                        }
-
-                    }
-                })
-
-            }
-        })
-
-    }
-
-    fun retrieveSellingTextbookList(user_id: String, viewModel: MainViewModel, fragment: Fragment?, activity: Activity?) {
-        var myRef = database.getReference(KEY_ACCOUNT)
-                .child(user_id).child(KEY_TEXTBOOK)
-        myRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-                println(p0.message)
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot != null){
-                    viewModel.recent_selling_Textbooks.clear()
-                    viewModel.selling_textbooks.clear()
-                    val textbook_snap = snapshot.children
-                    var iter = textbook_snap.iterator()
-
-                    for (item in iter) {
-                        //val textbooks = item.children
-                        //var textbookIter = textbooks.iterator()
-                        //for(textbook in textbookIter) {
-                            var potential_buyers : MutableList<Potential_Buyer>? = mutableListOf()
-                            println("Eeron ${item}")
-                            val userid = item.child(KEY_ACCOUNT).getValue(String::class.java)
-                            val bookid = item.child(KEY_BOOK_ID).value as Long
-                            val user_name = item.child(KEY_NAME).getValue(String::class.java)
-                            val title = item.child(KEY_TITLE).getValue(String::class.java)
-                            val isbn = item.child(KEY_ISBN).getValue(String::class.java)
-                            val course = item.child(KEY_COURSE).getValue(String::class.java)
-                            val instructor = item.child(KEY_INSTRUCTOR).getValue(String::class.java)
-                            val book_img_string = item.child(KEY_BOOK_IMG).getValue(String::class.java)
-
-                            var book_img : ByteArray? = null
-                            if (book_img_string != null) {
-                                book_img = Base64.decode(book_img_string, Base64.DEFAULT)
-                            }
-                            //val user_email = textbook.child(KEY_EMAIL).getValue(String::class.java)
-                            //val user_phone = textbook.child(KEY_PHONE).getValue(String::class.java)
-
-                            val buyers_iter = item.child(KEY_POTENTIAL_BUYERS).children
-                                    for (buyer in buyers_iter) {
-                                        if(buyer != null) {
-                                            var buyerName: Any?
-                                            var buyerID: Any?
-                                            var buyerApproval: Boolean = false
-
-                                            buyerID = buyer.child(KEY_BUYER_ID).value
-                                            buyerName = buyer.child(KEY_BUYER_NAME).value
-                                            buyerApproval = buyer.child(KEY_BUYER_APPROVAL).value as Boolean
-
-                                            if(buyerID != null && buyerName != null) {
-                                                potential_buyers?.add(Potential_Buyer(buyerID.toString(), buyerName.toString(), buyerApproval!!))
-                                            }
-                                        }
-                                    }
-                            var aTextbook : Textbooks? = null
-                            if(bookid != null && title != null && isbn != null){
-                                aTextbook = Textbooks( bookid, title!!, isbn!!, book_img, instructor, course,
-                                viewModel.user_account, potential_buyers)
-                                viewModel.selling_textbooks.add(aTextbook)
-                            }
-                        //}
-                    }//for
-
-                    viewModel.selling_textbooks.reverse()
-
-                    if(viewModel.selling_textbooks.size > 5) {
-                        viewModel.recent_selling_Textbooks.addAll(viewModel.selling_textbooks
-                                .subList(0, 5))
-                    }
-                    else {
-                        viewModel.recent_selling_Textbooks.addAll(viewModel.selling_textbooks)
-                    }
-
-
-                    if(fragment != null) {
-                        var ft: FragmentTransaction = fragment.activity!!.supportFragmentManager.beginTransaction()
-                        ft.detach(fragment)
-                        ft.attach(fragment)
-                        ft.commit()
-                    }
-
-                }
-            }
-
-        })
-    }
-*/
 
     fun sendRequest(user_name: String, user_id : String ,owner_id : String , book_id : Long){
         var myRef = database.getReference(KEY_TEXTBOOK_REF).child((owner_id + book_id.toString()))
@@ -354,7 +199,6 @@ class FirebaseDatabaseManager (){
         var phone_number: String? = null
         var email: String? = null
         var class_standing: String? = null
-        var prof_img: ByteArray? = null
         var reported_flags = 0L
         for (item in iter) {
             println("Eeron ${item}")
@@ -374,11 +218,6 @@ class FirebaseDatabaseManager (){
                 KEY_NAME -> {
                     name = item.value as String
                 }
-                KEY_PROF -> {
-                    val prof_img_string = item.value.toString()
-                    if(prof_img_string.isNotEmpty())
-                        prof_img = Base64.decode(prof_img_string, Base64.DEFAULT)
-                }
                 KEY_REPORTS -> {
                     val reports = item.children
                     for(report in reports){
@@ -392,10 +231,10 @@ class FirebaseDatabaseManager (){
 
 
         if(textbook != null){
-            textbook.affiliated_account = UserAccount(id, prof_img, name, email, phone_number,
+            textbook.affiliated_account = UserAccount(id, name, email, phone_number,
                     "", if(reported_flags > 20) -1 else 1, class_standing)
         }else {
-            viewModel.user_account = UserAccount(id, prof_img, name, email, phone_number,
+            viewModel.user_account = UserAccount(id, name, email, phone_number,
                     "", if(reported_flags > 20) -1 else 1, class_standing)
         }
 
@@ -450,8 +289,8 @@ class FirebaseDatabaseManager (){
 
     }
 
-    fun reportUser(viewModel: MainViewModel, report : String, other_reason : String?){
-        val myRef = database.getReference(KEY_ACCOUNT).child(viewModel.selected_requested.userid!!)
+    fun reportUser(textbook: Searched_Textbooks, report : String, other_reason : String?){
+        val myRef = database.getReference(KEY_ACCOUNT).child(textbook.userid!!)
                 .child(KEY_REPORTS).child(report)
         myRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
@@ -469,26 +308,57 @@ class FirebaseDatabaseManager (){
                     myRef.parent!!.child(KEY_OTHERS_LOG).child(report_count.toString())
                             .setValue(other_reason)
                 }
-
             }
         })
     }
 
     fun getAccountImg(account_id: String, imageView: ImageView){
-        var prof_img: ByteArray? = null
-        val myRef = database.getReference(KEY_ACCOUNT)
-        myRef.child(account_id).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-                println(p0.message)
-            }
+        var storageRef = storage.getReference()
 
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val prof_img_string = snapshot.child(KEY_PROF).value.toString()
-                if(prof_img_string.isNotEmpty())
-                    prof_img = Base64.decode(prof_img_string, Base64.DEFAULT)
-                    val bitmap = BitmapFactory.decodeByteArray(prof_img, 0, prof_img!!.size)
-                    imageView.setImageBitmap(bitmap)
-            }
-        })
+        var load = storageRef.child(ACCOUNT_IMG_HEADER+account_id)
+        val requestOptions = RequestOptions()
+        requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
+
+        Log.d("Eeron Tag:" ,load.getBytes(Long.MAX_VALUE).toString())
+        //Glide.with(imageView.context).load(load.downloadUrl).apply(requestOptions.skipMemoryCache(false))
+          //      .into(imageView)
+            //    .onLoadFailed(imageView.context.resources.getDrawable(R.drawable.blank_profile_picture_973460_640))
+
+        load.metadata.addOnSuccessListener {
+            Log.d("Eeron Tag:" , it.sizeBytes.toString())
+        }
+
+        load.downloadUrl.addOnSuccessListener {
+            Picasso.get().load(it.toString()).resize(200, 200)
+            .centerCrop().into(imageView)
+        }.addOnFailureListener {
+            Toast.makeText(imageView.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
+            imageView.setImageResource(R.drawable.blank_profile_picture_973460_640)
+        }
+
     }
+
+    fun getTextbookImg(textbook_id: String, account_id: String, imageView: ImageView){
+        var storageRef = storage.getReference()
+
+        var load = storageRef.child(TEXTBOOK_IMG_HEADER+account_id+textbook_id)
+        val requestOptions = RequestOptions()
+        requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(false)
+
+        load.metadata.addOnSuccessListener {
+            Log.d("Eeron Tag:" , it.sizeBytes.toString())
+        }
+
+
+        load.downloadUrl.addOnSuccessListener {
+            Picasso.get().load(it.toString()).resize(100, 100)
+                    .centerCrop().into(imageView)
+        }.addOnFailureListener {
+            Toast.makeText(imageView.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
+            imageView.setImageResource(R.drawable.android_image_5)
+
+        }
+
+    }
+
 }

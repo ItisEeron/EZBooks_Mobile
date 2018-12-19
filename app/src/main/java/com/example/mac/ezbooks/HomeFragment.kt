@@ -10,9 +10,14 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.*
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.R_B_RecyclerAdapter
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.UploadBooksRecyclerAdapter
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.home_fragment.view.*
 
@@ -23,8 +28,11 @@ class HomeFragment : Fragment() {
         fun newInstance() = HomeFragment()
     }
 
-
     private lateinit var booksViewModel: MainViewModel
+    private val storage = FirebaseStorage.getInstance()
+    var storageRef = storage.getReference()
+    private val databaseManager = FirebaseDatabaseManager()
+    private val ACCOUNT_IMG_HEADER = "images/accounts/"
 
     //For first Requested Books Recycler View!!!!
     private lateinit var requestedbookslayoutManager: RecyclerView.LayoutManager
@@ -40,7 +48,7 @@ class HomeFragment : Fragment() {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
         //Changes Title
-        activity?.title = "EZ-Books Home"
+        // activity?.title = "EZ-Books Home"
         //Creates the viewModel neccessary for maintaining the data.
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
@@ -57,19 +65,22 @@ class HomeFragment : Fragment() {
 
         view.home_card1.card_user_name.text = booksViewModel.user_account.user_name
         view.home_card1.card_user_phone_number.text = booksViewModel.user_account.phone_number
+        view.home_card1.card_user_email.text = booksViewModel.user_account.email_address
 
-        if(booksViewModel.user_account.profile_img != null){
-            var bitmap = BitmapFactory.
-                    decodeByteArray(booksViewModel.user_account.profile_img,
-                            0, booksViewModel!!.user_account!!.profile_img!!.size)
+        databaseManager.getAccountImg(booksViewModel.user_account.user_id!!, view.card_user_image)
 
-            view.home_card1.card_user_image.setImageBitmap(bitmap)
-        }
-        //This Shows the Current Accounts Status and Changes the values as neccessarry
+        /*
+        var load = storageRef.child(ACCOUNT_IMG_HEADER+booksViewModel.user_account.user_id)
+        load.downloadUrl.addOnSuccessListener {
+            Picasso.with(view.context).load(it.toString()).into(view.card_user_image)
+        }.addOnFailureListener {
+            Toast.makeText(view.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
+        }*/
+        //This Shows the Current Accounts Status and Changes the values as necessary
         when(booksViewModel.user_account.account_status){
             1 ->{
                 view.home_card1.card_user_status.text = "Good"
-                view.home_card1.card_user_status.setTextColor(resources.getColor(android.R.color.holo_green_light))
+                view.home_card1.card_user_status.setTextColor(resources.getColor(R.color.colorPrimaryDark))
             }
             0 ->{
                 view.home_card1.card_user_status.text = "Normal"
@@ -77,7 +88,7 @@ class HomeFragment : Fragment() {
             }
             else ->{
                 view.home_card1.card_user_status.text = "Bad"
-                view.home_card1.card_user_status.setTextColor(resources.getColor(android.R.color.holo_red_light))
+                view.home_card1.card_user_status.setTextColor(resources.getColor(R.color.colorAccent))
             }
 
         }

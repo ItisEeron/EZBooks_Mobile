@@ -11,6 +11,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
+import com.example.mac.ezbooks.ui.main.Searched_Textbooks
 import com.example.mac.ezbooks.ui.main.UserAccount
 import kotlinx.android.synthetic.main.report_user_layout.*
 import kotlinx.android.synthetic.main.report_user_layout.view.*
@@ -21,8 +22,8 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private lateinit var spinner : Spinner
     private lateinit var reportString : String
     private lateinit var booksViewModel : MainViewModel
-    private lateinit var reported_Account : UserAccount
     private var firebaseDatabaseManager = FirebaseDatabaseManager()
+    private var textbook : Searched_Textbooks? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.report_user_layout, container, false)
@@ -31,6 +32,12 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
+
+        val args = arguments
+        val textbook_arg = args?.getSerializable("textbook")
+        if(textbook_arg != null) {
+            textbook = textbook_arg as Searched_Textbooks
+        }
 
         //Initialize the Spinner
         spinner = view.findViewById(R.id.reported_reasons_spinner)
@@ -50,30 +57,25 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         //Time to initialze the remaining view
         //Add to the name and the image. That is all!!
-        view.reported_user_name.text = booksViewModel.selected_requested.user_name
-        view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
-        firebaseDatabaseManager.getAccountImg(booksViewModel.selected_requested.userid!!, view.reported_user_image)
+        if(textbook_arg == null) {
+            view.reported_user_name.text = textbook?.user_name
+            view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
+            firebaseDatabaseManager.getAccountImg(textbook?.userid!!, view.reported_user_image)
+        }else{
+            view.reported_user_name.text = textbook!!.user_name
+            view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
+            firebaseDatabaseManager.getAccountImg(textbook!!.userid!!, view.reported_user_image)
+        }
+
 
         //Now time to initialize the buttons
         view.submit_report_button.setOnClickListener {
             if (reportString != null) {
                 var other_reason = view.other_explaination.text.toString()
 
-
-
-                firebaseDatabaseManager.reportUser(booksViewModel, reportString,
+                firebaseDatabaseManager.reportUser(textbook!!, reportString,
                         if(other_reason.isEmpty()) null else other_reason)
                 firebaseDatabaseManager.removeRequest(booksViewModel, booksViewModel.selected_requested)
-
-                //Now Remove the Book So the User does not have to deal with an unwanted seller!!
-                if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){
-                    booksViewModel.recent_requested_Textbooks.remove(booksViewModel.selected_requested)
-
-                    if(booksViewModel.requested_textbooks.size > RECENTS_SIZE ){
-                        booksViewModel.recent_requested_Textbooks.add(booksViewModel.requested_textbooks[RECENTS_SIZE-1])
-                    }
-                }
-                booksViewModel.requested_textbooks.remove(booksViewModel.selected_requested)
 
                 Toast.makeText(activity,
                         "You have reported " + booksViewModel.selected_requested.user_name + ".",

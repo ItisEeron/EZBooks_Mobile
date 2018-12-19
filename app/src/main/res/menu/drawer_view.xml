@@ -15,11 +15,11 @@
                     android:title="@string/upload_book" />
                 <item
                     android:id="@+id/nav_requested_books"
-                    android:icon="@drawable/icons8_sell_50"
+                    android:icon="@drawable/icons8_sell_stock_50"
                     android:title="@string/requested_books" />
                 <item
                     android:id="@+id/nav_books_you_sell"
-                    android:icon="@drawable/icons8_sell_stock_50"
+                    android:icon="@drawable/icons8_sell_50"
                     android:title="@string/books_user_sell" />
                 <item
                     android:id="@+id/nav_search_shop"

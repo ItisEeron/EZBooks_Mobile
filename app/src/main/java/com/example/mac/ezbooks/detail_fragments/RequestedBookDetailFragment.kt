@@ -22,6 +22,17 @@ class RequestedBookDetailFragment : Fragment() {
     private lateinit var textbook: Searched_Textbooks
     private var RECENTS_SIZE = 5
     private var MIN_SIZE = 0
+    val databaseManager : FirebaseDatabaseManager = FirebaseDatabaseManager()
+    lateinit var selectedTextbook : Searched_Textbooks
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        booksViewModel = activity?.run {
+            ViewModelProviders.of(this).get(MainViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
+
+        selectedTextbook = booksViewModel.selected_requested
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.detail_requested_books_layout, container, false)
@@ -30,33 +41,32 @@ class RequestedBookDetailFragment : Fragment() {
             ViewModelProviders.of(this).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
+        selectedTextbook = booksViewModel.selected_requested
+
         //Set up information
-        view.detail_requested_book_title.text = booksViewModel.selected_requested.title
-        view.detail_requested_book_isbn.text = booksViewModel.selected_requested.isbn
-        view.detail_requested_book_course.text = booksViewModel.selected_requested.course
-        view.detail_requested_book_instructor.text = booksViewModel.selected_requested.instructor
+        view.detail_requested_book_title.text = selectedTextbook.title
+        view.detail_requested_book_isbn.text = selectedTextbook.isbn
+        view.detail_requested_book_course.text = selectedTextbook.course
+        view.detail_requested_book_instructor.text = selectedTextbook.instructor
 
-        if(booksViewModel.selected_requested.book_img != null) {
-            var bitmap = BitmapFactory.decodeByteArray(booksViewModel.selected_requested.book_img,
-                    0, booksViewModel.selected_requested.book_img!!.size)
-            view.detail_requested_book_image.setImageBitmap(bitmap)
-        }
+        databaseManager.getTextbookImg(selectedTextbook.bookid.toString(), selectedTextbook.userid!!,
+                view.detail_requested_book_image)
 
-        view.detail_requested_book_seller.text = booksViewModel.selected_requested.user_name
+        view.detail_requested_book_seller.text = selectedTextbook.user_name
 
         //First check to see if the selected list of buyers is null (it should not!!)
         var isAproved = false
-        if(booksViewModel.selected_requested.potential_buyers != null){
+        if(selectedTextbook.potential_buyers != null){
             //Find your id
-            for( potentialbuyeraccount : Potential_Buyer in booksViewModel.selected_requested.potential_buyers!!) {
+            for( potentialbuyeraccount : Potential_Buyer in selectedTextbook.potential_buyers!!) {
                 if(potentialbuyeraccount.account_id == booksViewModel.user_account.user_id){//When found check if your id has been approved
                     isAproved = potentialbuyeraccount.approved
                     break
                 }
             }
             if(isAproved) {//If Id
-                view.detail_requested_book_phone_number.text = booksViewModel.selected_requested.user_phone
-                view.detail_requested_book_email.text = booksViewModel.selected_requested.user_email
+                view.detail_requested_book_phone_number.text = selectedTextbook.user_phone
+                view.detail_requested_book_email.text = selectedTextbook.user_email
             }else{
                 view.detail_requested_book_phone_number.text = "Not Authorized to View Information"
                 view.detail_requested_book_email.text = "Not Authorized to View Information"
@@ -71,24 +81,24 @@ class RequestedBookDetailFragment : Fragment() {
 
             //Update the home page view...Remove the book if it is found in the homepage recycler view, also adjust the view when removed
             booksViewModel.recent_requested_Textbooks.clear()
-            if(booksViewModel.recent_requested_Textbooks.contains(booksViewModel.selected_requested)){
-                booksViewModel.recent_requested_Textbooks.remove(booksViewModel.selected_requested)
+            if(booksViewModel.recent_requested_Textbooks.contains(selectedTextbook)){
+                booksViewModel.recent_requested_Textbooks.remove(selectedTextbook)
 
                 if(booksViewModel.requested_textbooks.size > RECENTS_SIZE ){
                     booksViewModel.recent_requested_Textbooks.add(booksViewModel.requested_textbooks[RECENTS_SIZE-1])
                 }
             }
-            booksViewModel.requested_textbooks.remove(booksViewModel.selected_requested)
+            booksViewModel.requested_textbooks.remove(selectedTextbook)
 
             //Remove if the id of the current user
-            if(booksViewModel.selected_requested.potential_buyers != null) {
-                booksViewModel.selected_requested.potential_buyers!!.removeIf { Potential_Buyer ->
+            if(selectedTextbook.potential_buyers != null) {
+                selectedTextbook.potential_buyers!!.removeIf { Potential_Buyer ->
                     Potential_Buyer.account_id == booksViewModel.user_account.user_id
                 }
             }
 
             var databaseManager = FirebaseDatabaseManager()
-            databaseManager.removeRequest(booksViewModel, booksViewModel.selected_requested)
+            databaseManager.removeRequest(booksViewModel, selectedTextbook)
             val fragmentManager = activity?.supportFragmentManager
             fragmentManager?.popBackStack()
 
@@ -98,9 +108,19 @@ class RequestedBookDetailFragment : Fragment() {
         }
 
         view.edit_button.setOnClickListener{
+
+
+            var TAG = textbook.userid + textbook.bookid.toString() +
+                    "_report"
+
+            //Prevents fragment from being recreated multiple times
+            var newFragment = activity?.supportFragmentManager?.findFragmentByTag(TAG)
+            if(newFragment == null) {
+                newFragment = ReportUserFragment()
+            }
             activity?.supportFragmentManager?.beginTransaction()?.
                     setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                    ReportUserFragment())?.addToBackStack(null)?.commit()
+                    newFragment, TAG)?.addToBackStack(TAG)?.commit()
         }
 
         return view

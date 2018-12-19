@@ -18,6 +18,7 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
@@ -56,7 +57,7 @@ class SearchFragment :  Fragment() {
         super.onCreate(savedInstanceState)
         //Changes Title
 
-        activity?.title = "Search for a Book"
+        //activity?.title = "Search for a Book"
         //Creates the viewModel neccessary for maintaining the data.
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
@@ -126,9 +127,9 @@ class SearchFragment :  Fragment() {
 
                 var counter = 0
                 var iter = snapshot.children
-                var exit = false
-
                 for (textbook in iter){
+                    var exit = false
+
                     val userid = textbook.child(KEY_ACCOUNT).value.toString()
                     val user_email = textbook.child(KEY_EMAIL).getValue(String::class.java)
                     val user_phone = textbook.child(KEY_PHONE).getValue(String::class.java)
@@ -144,6 +145,8 @@ class SearchFragment :  Fragment() {
                     if(book_img_string != null)
                         book_img =  Base64.decode(book_img_string, Base64.DEFAULT)
 
+                    if(userid == booksViewModel.user_account.user_id)
+                        exit = true
 
                     val potential_Buyer : MutableList<Potential_Buyer> = mutableListOf()
 
@@ -158,7 +161,7 @@ class SearchFragment :  Fragment() {
                         buyerApproval =  buyer.child(KEY_BUYER_APPROVAL).value as Boolean
 
                         if(buyerID == booksViewModel.user_account.user_id)
-                            //exit = true
+                            exit = true
 
                         potential_Buyer.add(Potential_Buyer(buyerID!!, buyerName!!, buyerApproval!!))
                     }
@@ -170,12 +173,12 @@ class SearchFragment :  Fragment() {
                             instructor!!.toLowerCase().contains(searchString.toLowerCase())) {
                         if(exit == false) {
                             searchedQuery?.add(Searched_Textbooks(userid, bookid, user_name, user_email, user_phone, title, isbn,
-                                    course, instructor, book_img, potential_Buyer))
+                                    course, instructor, potential_Buyer))
                             counter++
                         }
 
                     }
-                    if (counter == 20)
+                    if (counter == 100)
                         break
 
                 }

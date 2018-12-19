@@ -5,13 +5,14 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/content_frame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/common_google_signin_btn_text_dark_default"
+        android:background="@color/colorPrimaryDark"
         android:orientation="vertical">
 
         <android.support.design.widget.CoordinatorLayout
@@ -22,26 +23,52 @@
             <include
                 layout="@layout/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content" />
 
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/search_Textbook_fab"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="16dp"
-                android:src="@drawable/ic_add"
-                app:backgroundTint="@color/common_google_signin_btn_text_light_default" />
+                android:layout_gravity="right|center_vertical"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/search_Textbook_fab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/common_google_signin_btn_text_dark_default"
+                    android:clickable="true"
+                    app:backgroundTint="@color/common_google_signin_btn_text_dark_pressed"
+                    app:fabSize="mini"
+                    app:srcCompat="@drawable/icons8_search_24" />
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="31dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    app:srcCompat="@color/btn_login_bg" />
+
+            </LinearLayout>
+
+
         </android.support.design.widget.CoordinatorLayout>
 
-        <FrameLayout
-            android:id="@+id/flContent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="wrap_content"
+            android:layout_height="577dp"
+            android:layout_gravity="center"
+            android:background="@color/colorAccent">
 
-        </FrameLayout>
+            <FrameLayout
+                android:id="@+id/flContent"
+                android:layout_width="382dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/colorAccent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            </FrameLayout>
+        </android.support.design.widget.CoordinatorLayout>
 
 
     </LinearLayout>
@@ -54,10 +81,11 @@
         android:layout_gravity="start"
         android:clickable="true"
         android:fitsSystemWindows="true"
+        android:focusable="true"
         android:foreground="?selectableItemBackground"
-        app:menu="@menu/drawer_view"
         app:headerLayout="@layout/navigation_header"
-        android:focusable="true">
+        app:itemTextColor="@color/colorPrimaryDark"
+        app:menu="@menu/drawer_view">
 
     </android.support.design.widget.NavigationView>
 

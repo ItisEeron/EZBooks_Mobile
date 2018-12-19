@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#a867e2d4</color>
-    <color name="colorPrimaryDark">#c4f8a237</color>
-    <color name="colorAccent">#d81b60</color>
+    <color name="colorPrimary">#ff6861</color>
+    <color name="colorPrimaryDark">#222222</color>
+    <color name="colorAccent">#ffffff</color>
 
 
-    <color name="colorPrimary2">#00bcd4</color>
+    <color name="colorPrimary2">#4800bcd4</color>
     <color name="colorPrimaryDark2">#0097a7</color>
     <color name="colorAccent2">#f2fe71</color>
 
     <color name="bg_login">#26ae90</color>
-    <color name="bg_register">#2e3237</color>
+    <color name="bg_register">#b85fbff4</color>
     <color name="bg_main">#428bca</color>
     <color name="white">#ffffff</color>
     <color name="input_login">#222222</color>
@@ -19,8 +19,10 @@
     <color name="input_register_bg">#3b4148</color>
     <color name="input_register_hint">#5e6266</color>
     <color name="btn_login">#26ae90</color>
-    <color name="btn_login_bg">#eceef1</color>
+    <color name="btn_login_bg">#00eceef1</color>
     <color name="lbl_name">#333333</color>
     <color name="btn_logut_bg">#ff6861</color>
+    <color name="upload_book_color">#FF00BCD4</color>
+    <color name="approved_book">#81C784</color>
 
 </resources>

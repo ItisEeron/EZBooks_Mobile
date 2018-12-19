@@ -2,6 +2,7 @@ package com.example.mac.ezbooks.ui.main
 
 import android.arch.lifecycle.ViewModel
 import android.support.design.widget.NavigationView
+import android.support.v4.app.Fragment
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import java.io.Serializable
 
@@ -15,11 +16,13 @@ class MainViewModel : ViewModel() {
     lateinit var recent_requested_Textbooks: MutableList<Searched_Textbooks>
     lateinit var recent_selling_Textbooks: MutableList<Textbooks>
     private val databaseManager = FirebaseDatabaseManager()
+    var detailFragTable = HashMap<String, Fragment>()
+
 
 
     fun getAllTextbooks(user_id : String, user_name: String?, user_email: String?, navigationView: NavigationView?) {
         if(!::user_account.isInitialized){
-            user_account =  UserAccount(user_id, null,user_name,
+            user_account =  UserAccount(user_id, user_name,
                     user_email, null, "5/17/18",
                     0, null)
 
@@ -45,9 +48,9 @@ class MainViewModel : ViewModel() {
 
 
 //TODO:CHECK WITH OTHER EZ-BOOKS MEMBERS TO MAKE SURE INFORMATION IS VALID!!
-data class Textbooks( val book_id: Long, var Title:String, var isbn:String, var book_img: ByteArray?, var instructor:String?, var course:String?,
+data class Textbooks( val book_id: Long, var Title:String, var isbn:String, var instructor:String?, var course:String?,
                      var affiliated_account:UserAccount?, var potential_buyers: MutableList<Potential_Buyer>?)
-data class UserAccount(var user_id: String?, var profile_img: ByteArray?, var user_name:String?, var email_address:String?,
+data class UserAccount(var user_id: String?, var user_name:String?, var email_address:String?,
                     var phone_number:String?, val date_joined:String?, var account_status:Int,
                     var class_standing:String?)
 data class Potential_Buyer(val account_id:String, var account_name:String, var approved:Boolean)
@@ -61,5 +64,4 @@ data class Searched_Textbooks(val userid : String?,
                               val isbn : String?,
                               val course : String?,
                               val instructor : String?,
-                              val book_img : ByteArray?,
                               var potential_buyers: MutableList<Potential_Buyer>?) : Serializable

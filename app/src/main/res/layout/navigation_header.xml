@@ -8,11 +8,22 @@
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:id="@+id/user_header_image"
-        android:layout_width="118dp"
-        android:layout_height="118dp"
-        app:srcCompat="@drawable/blank_profile_picture_973460_640" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_header_image"
+            android:layout_width="118dp"
+            android:layout_height="118dp"
+            android:cropToPadding="true"
+            android:src="@drawable/blank_profile_picture_973460_640"
+            app:civ_border_color="@color/colorAccent"
+            app:civ_border_width="3dp"
+            android:background="@drawable/image_border"/>
+
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/user_header_name"

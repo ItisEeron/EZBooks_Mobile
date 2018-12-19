@@ -1,6 +1,7 @@
 package com.example.mac.ezbooks.di
 
 import android.app.Activity
+import android.app.Instrumentation
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,12 +13,9 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.FileProvider
 import android.widget.ImageView
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-
+import java.io.*
 
 
 class ImageHandler {
@@ -105,4 +103,5 @@ class ImageHandler {
             mCurrentPhotoPath.replace(mCurrentPhotoPath, absolutePath)
         }
     }
+
 }

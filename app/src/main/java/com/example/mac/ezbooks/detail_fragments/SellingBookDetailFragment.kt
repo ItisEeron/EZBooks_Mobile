@@ -27,47 +27,56 @@ class SellingBookDetailFragment : Fragment() {
     lateinit var image: ImageView
     private lateinit var booksViewModel: MainViewModel
     private var RECENTS_SIZE = 5
-    private lateinit var database : FirebaseDatabase
 
 
-    private lateinit var databaseManager: FirebaseDatabaseManager
+    private var databaseManager = FirebaseDatabaseManager()
+
     private lateinit var UserNameslayoutManager: RecyclerView.LayoutManager
     private lateinit var UserNamesadapter: RecyclerView.Adapter<UserNamesRecyclerAdapter.ViewHolder>
     private lateinit var UserNamesRecyclerview : RecyclerView
+    private lateinit var selectedTextbook : Textbooks
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.detail_selling_books_layout, container, false)
-
-        database = FirebaseDatabase.getInstance()
-
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
-        //Set up information
-        view.detail_selling_book_title.text = booksViewModel.selected_selling.Title
-        view.detail_selling_book_isbn.text = booksViewModel.selected_selling.isbn
-        view.detail_selling_book_course.text = booksViewModel.selected_selling.course
-        view.detail_selling_book_instructor.text = booksViewModel.selected_selling.instructor
+        selectedTextbook = booksViewModel.selected_selling
+    }
 
-        if(booksViewModel.selected_selling.book_img != null) {
-            val bitmap = BitmapFactory.decodeByteArray(booksViewModel.selected_selling.book_img,
-                    0, booksViewModel.selected_selling.book_img!!.size)
-            view.detail_selling_book_image.setImageBitmap(bitmap)
-        }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.detail_selling_books_layout, container, false)
+
+        //Set up information
+        view.detail_selling_book_title.text = selectedTextbook.Title
+        view.detail_selling_book_isbn.text = selectedTextbook.isbn
+        view.detail_selling_book_course.text = selectedTextbook.course
+        view.detail_selling_book_instructor.text = selectedTextbook.instructor
+
+        databaseManager.getTextbookImg(selectedTextbook.book_id.toString(), selectedTextbook.affiliated_account?.user_id!!,
+                view.detail_selling_book_image)
 
         view.edit_listing_button.setOnClickListener{
+
+            var TAG = selectedTextbook.affiliated_account?.user_id + selectedTextbook.book_id.toString() +
+                    "_edit"
+
+            //Prevents fragment from being recreated multiple times
+            var newFragment = activity?.supportFragmentManager?.findFragmentByTag(TAG)
+            if(newFragment == null) {
+                newFragment = ReportUserFragment()
+            }
             activity?.supportFragmentManager?.beginTransaction()?.
                     setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                    EditListingFragment())?.addToBackStack(null)?.commit()
+                    newFragment, TAG)?.addToBackStack(TAG)?.commit()
         }
 
         view.remove_listing_button.setOnClickListener{
             //Update the home page view...Remove the book if it is found in the homepage recycler view, also adjust the view when removed
             booksViewModel.recent_selling_Textbooks.clear()
-            if(booksViewModel.recent_selling_Textbooks.contains(booksViewModel.selected_selling)){
-                booksViewModel.recent_selling_Textbooks.remove(booksViewModel.selected_selling)
+            if(booksViewModel.recent_selling_Textbooks.contains(selectedTextbook)){
+                booksViewModel.recent_selling_Textbooks.remove(selectedTextbook)
 
                 if(booksViewModel.selling_textbooks.size > RECENTS_SIZE ){
                     booksViewModel.recent_selling_Textbooks.add(booksViewModel.selling_textbooks[RECENTS_SIZE-1])
@@ -75,15 +84,15 @@ class SellingBookDetailFragment : Fragment() {
             }
 
             databaseManager = FirebaseDatabaseManager()
-            val textbook : Textbooks = booksViewModel.selected_selling.copy()
+            val textbook : Textbooks = selectedTextbook.copy()
             val sText = Searched_Textbooks(booksViewModel.user_account.user_id, textbook.book_id,
                     booksViewModel.user_account.user_name, booksViewModel.user_account.email_address,
                     booksViewModel.user_account.phone_number, textbook.Title, textbook.isbn,
-                    textbook.course, textbook.instructor, textbook.book_img, textbook.potential_buyers)
+                    textbook.course, textbook.instructor, textbook.potential_buyers)
 
             databaseManager.removeTextbook(sText)
 
-            booksViewModel.selling_textbooks.remove(booksViewModel.selected_selling)
+            booksViewModel.selling_textbooks.remove(selectedTextbook)
 
 
 
@@ -114,4 +123,5 @@ class SellingBookDetailFragment : Fragment() {
         UserNamesRecyclerview.layoutManager = UserNameslayoutManager
 
     }
+
 }
