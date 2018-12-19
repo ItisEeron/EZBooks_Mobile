@@ -1,6 +1,5 @@
 package com.example.mac.ezbooks.ui.main.RecyclerView_Adapters
 
-import android.graphics.BitmapFactory
 import android.support.v4.app.Fragment
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
@@ -9,17 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.detail_fragments.RequestedBookDetailFragment
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
-import com.example.mac.ezbooks.ui.main.Searched_Textbooks
-import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
-import com.bumptech.glide.Glide
-import android.text.method.TextKeyListener.clear
+
 
 
 
@@ -30,9 +24,6 @@ import android.text.method.TextKeyListener.clear
 //Other instances (Requested Books, Search, and Uploaded) will show maximum
 //Search will have filtering options and will actually only display the first 40 books
 class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : MainViewModel): RecyclerView.Adapter<R_B_RecyclerAdapter.ViewHolder>() {
-    private val storage = FirebaseStorage.getInstance()
-    var storageRef = storage.getReference()
-    private val TEXTBOOK_IMG_HEADER = "images/textbooks/"
     var databaseManager = FirebaseDatabaseManager()
 
 
@@ -50,10 +41,18 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
 
             itemView.setOnClickListener{view ->
                 var position: Int = adapterPosition
+                var TAG = viewModel.requested_textbooks[position].userid + viewModel.requested_textbooks[position].bookid.toString() +
+                        "_detail"
+
+                //Prevents fragment from being recreated multiple times
+                var frag = fragment.activity?.supportFragmentManager?.findFragmentByTag(TAG)
+                if(frag == null)
+                    frag = RequestedBookDetailFragment()
+
                 viewModel.selected_requested = viewModel.requested_textbooks[position]
                  fragment.activity?.supportFragmentManager?.beginTransaction()?.
                         setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                        RequestedBookDetailFragment())?.addToBackStack(null)?.commit()
+                        frag,TAG)?.addToBackStack(TAG)?.commit()
             }
         }
     }

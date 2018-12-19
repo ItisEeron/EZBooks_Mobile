@@ -66,17 +66,27 @@ class SearchedTextbookFragment : Fragment() {
             Toast.makeText(activity,
                     "You have successfully requested the textbook!",
                     Toast.LENGTH_LONG).show()
+
+            activity?.supportFragmentManager?.popBackStack()
         }
 
         view.edit_button.setOnClickListener{
 
             val b = Bundle()
             b.putSerializable("textbook", textbook)
-            var newFragment = ReportUserFragment()
-            newFragment.arguments = b
+
+            var TAG = textbook.userid + textbook.bookid.toString() +
+                    "_report"
+
+            //Prevents fragment from being recreated multiple times
+            var newFragment = activity?.supportFragmentManager?.findFragmentByTag(TAG)
+            if(newFragment == null) {
+                newFragment = ReportUserFragment()
+                newFragment.arguments = b
+            }
             activity?.supportFragmentManager?.beginTransaction()?.
                     setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                    newFragment)?.addToBackStack(null)?.commit()
+                    newFragment,TAG)?.addToBackStack(TAG)?.commit()
 
         }
 

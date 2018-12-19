@@ -1,6 +1,7 @@
 package com.example.mac.ezbooks.di
 
 import android.app.Activity
+import android.app.Instrumentation
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,8 +15,6 @@ import android.support.v4.content.FileProvider
 import android.widget.ImageView
 import java.text.SimpleDateFormat
 import java.util.*
-import com.google.common.io.Flushables.flush
-import android.graphics.Bitmap.createScaledBitmap
 import java.io.*
 
 

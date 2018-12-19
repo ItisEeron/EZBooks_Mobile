@@ -1,5 +1,6 @@
 package com.example.mac.ezbooks.ui.main
 
+import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -14,17 +15,18 @@ import com.example.mac.ezbooks.R
 import kotlinx.android.synthetic.main.edit_user_account_layout.*
 import kotlinx.android.synthetic.main.edit_user_account_layout.view.*
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Environment
+import android.support.v4.app.FragmentActivity
+import android.support.v4.content.FileProvider
 import android.util.Log
-import android.widget.ImageView
-import com.bumptech.glide.Glide
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
 import com.squareup.picasso.Picasso
-import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EditAccountFragment : Fragment(){
 
@@ -49,7 +51,11 @@ class EditAccountFragment : Fragment(){
         main_account = ezbooksViewModel.user_account
 
         //Present User Account image as the uploaded image for this page
-        databaseManager.getAccountImg(main_account.user_id.toString(), view.user_account_Image)
+        if(selectedImage == null)
+            databaseManager.getAccountImg(main_account.user_id.toString(), view.user_account_Image)
+        else{
+            Picasso.get().load(selectedImage).into(view.user_account_Image)
+        }
 
         view.submit_account_changes_button.setOnClickListener{
             val fragmentManager = activity?.supportFragmentManager
@@ -94,15 +100,58 @@ class EditAccountFragment : Fragment(){
 
         if(context!!.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             view.upload_from_camera_button.setOnClickListener {
-                imageHandler.dispatchTakePictureIntent(this , this.activity!!, mCurrentPhotoPath)
+                dispatchTakePictureIntent(this , this.activity!!, mCurrentPhotoPath)
                 Log.i("Eeron Log", "I Made it!!")
-                //setPic()
             }
         }
 
         return view
     }
 
+    fun dispatchTakePictureIntent(fragment: Fragment, activity: FragmentActivity, mCurrentPhotoPath: String) {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            // Ensure that there's a camera activity to handle the intent
+            takePictureIntent.resolveActivity(activity.packageManager)?.also {
+                // Create the File where the photo should go
+                val photoFile: File? = try {
+                    createImageFile(mCurrentPhotoPath, activity)
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    println(ex)
+                    null
+                }
+                // Continue only if the File was successfully created
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                            fragment.context!!,
+                            "com.example.android.fileprovider",
+                            it
+                    )
+
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE, null)
+
+                }
+            }
+        }
+    }
+
+
+    @Throws(IOException::class)
+    fun createImageFile(mCurrentPhotoPath: String, activity: Activity): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File? = activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            mCurrentPhotoPath.replace(mCurrentPhotoPath, absolutePath)
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -113,7 +162,7 @@ class EditAccountFragment : Fragment(){
 
                     try {
                         selectedImage = data?.getData()
-                        Picasso.with(this.context!!).load(selectedImage).into(this.user_account_Image)
+                        Picasso.get().load(selectedImage).into(this.user_account_Image)
                         /*
                         var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
                                 ?.getContentResolver(), selectedImage)
@@ -128,8 +177,9 @@ class EditAccountFragment : Fragment(){
                     }
                 }
                 REQUEST_IMAGE_CAPTURE ->{
-                    selectedImage = data?.extras?.get("data") as Uri
-                    Picasso.with(this.context!!).load(selectedImage).into(this.user_account_Image)
+                    //selectedImage = data?.extras?.get("data") as Uri
+                    //Picasso.with(this.context!!).load(selectedImage).into(this.user_account_Image)
+                    imageHandler.setPic(view!!.user_account_Image, mCurrentPhotoPath)
                     /*
                     val imageBitmap = data?.extras?.get("data") as? Bitmap
                     user_account_Image.setImageBitmap(imageBitmap)

@@ -49,11 +49,19 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
             //This will allow the object to invoke an event when clicked on!!!
             itemView.setOnClickListener{view ->
                 var position: Int = getAdapterPosition()
+                var TAG = viewModel.selling_textbooks[position].affiliated_account?.user_id!! +
+                        viewModel.selling_textbooks[position].book_id.toString() +
+                        "_detail"
+
+                //Prevents fragment from being recreated multiple times
+                var frag = fragment.activity?.supportFragmentManager?.findFragmentByTag(TAG)
+                if(frag == null)
+                    frag = SellingBookDetailFragment()
 
                 viewModel.selected_selling = viewModel.selling_textbooks[position]
                 fragment.activity?.supportFragmentManager?.beginTransaction()?.
                         setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                        SellingBookDetailFragment())?.addToBackStack(null)?.commit()
+                        frag, TAG)?.addToBackStack(TAG)?.commit()
             }
         }
     }

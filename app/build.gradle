@@ -54,9 +54,12 @@ dependencies {
     implementation 'com.google.apis:google-api-services-books:v1-rev104-1.25.0'
     implementation 'com.google.code.gson:gson:2.8.2'
 
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation 'com.github.bumptech.glide:glide:4.8.0'
-    annotationProcessor 'com.github.bumptech.glide:glide:4.8.0'
+    kapt 'com.github.bumptech.glide:glide:4.8.0'
+    kapt "android.arch.lifecycle:compiler:1.0.0"
+
 }
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-kapt'

@@ -20,6 +20,7 @@ import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
 import com.example.mac.ezbooks.ui.main.MainViewModel
+import com.example.mac.ezbooks.ui.main.Textbooks
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.upload_book_layout.*
 import kotlinx.android.synthetic.main.upload_book_layout.view.*
@@ -37,16 +38,11 @@ class EditListingFragment : Fragment() {
     val GET_FROM_GALLERY = 3
     val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var bookImage : ImageView
+    private lateinit var selectedTextbook : Textbooks
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.upload_book_layout, container, false)
 
-        booksViewModel = activity?.run {
-            ViewModelProviders.of(this).get(MainViewModel::class.java)
-        }
-                ?: throw Exception("Invalid Activity")
-
-        val selectedTextbook = booksViewModel.selected_selling
         bookImage = view.user_image
         view.post_book_label.text = "Edit a Book:"
         view.submit_book_button.text = "Submit Edits"
@@ -56,22 +52,22 @@ class EditListingFragment : Fragment() {
 
             //TODO: COPY METHOD BREAKS
             if(!book_title_editText.text.isBlank()) {
-                booksViewModel.selected_selling.Title = book_title_editText.text.toString()
+                selectedTextbook.Title = book_title_editText.text.toString()
             }//if
             if(!book_isbn_editText.text.isBlank()){
-                booksViewModel.selected_selling.isbn = book_isbn_editText.text.toString()
+                selectedTextbook.isbn = book_isbn_editText.text.toString()
             }//if
             if(!book_course_editText.text.isBlank()){
-                booksViewModel.selected_selling.course = book_course_editText.text.toString()
+                selectedTextbook.course = book_course_editText.text.toString()
             }//if
             if(!book_instructor_editText.text.isBlank()){
-                booksViewModel.selected_selling.instructor = book_instructor_editText.text.toString()
+                selectedTextbook.instructor = book_instructor_editText.text.toString()
             }//if
 
             databaseManager.getTextbookImg(selectedTextbook.book_id.toString(), selectedTextbook.affiliated_account?.user_id!!,
                     bookImage)
 
-            databaseManager.createTextbook(booksViewModel.user_account,booksViewModel.selected_selling,
+            databaseManager.createTextbook(booksViewModel.user_account,selectedTextbook,
                     selectedImage)
 
             //Navigate back home
@@ -125,6 +121,13 @@ class EditListingFragment : Fragment() {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
         activity?.title = "Edit a Book to Sell"
+
+        booksViewModel = activity?.run {
+            ViewModelProviders.of(this).get(MainViewModel::class.java)
+        }
+                ?: throw Exception("Invalid Activity")
+
+        selectedTextbook = booksViewModel.selected_selling
     }
 
 
@@ -137,7 +140,7 @@ class EditListingFragment : Fragment() {
 
                     try {
                         selectedImage = data?.getData()
-                        Picasso.with(this.context).load(selectedImage).into(bookImage)
+                        Picasso.get().load(selectedImage).into(bookImage)
                         /*var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
                                 ?.getContentResolver(), selectedImage)
                         user_image.setImageBitmap(bitmap)
@@ -152,7 +155,7 @@ class EditListingFragment : Fragment() {
                 }
                 REQUEST_IMAGE_CAPTURE ->{
                     selectedImage = data?.extras?.get("data") as? Uri
-                    Picasso.with(this.context).load(selectedImage).into(bookImage)
+                    Picasso.get().load(selectedImage).into(bookImage)
 
                     /*val imageBitmap = data?.extras?.get("data") as? Bitmap
 

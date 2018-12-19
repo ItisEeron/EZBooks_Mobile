@@ -58,9 +58,9 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
         //Time to initialze the remaining view
         //Add to the name and the image. That is all!!
         if(textbook_arg == null) {
-            view.reported_user_name.text = booksViewModel.selected_requested.user_name
+            view.reported_user_name.text = textbook?.user_name
             view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
-            firebaseDatabaseManager.getAccountImg(booksViewModel.selected_requested.userid!!, view.reported_user_image)
+            firebaseDatabaseManager.getAccountImg(textbook?.userid!!, view.reported_user_image)
         }else{
             view.reported_user_name.text = textbook!!.user_name
             view.reported_user_image.setImageDrawable(resources.getDrawable(R.mipmap.ic_launcher_round))
@@ -73,7 +73,7 @@ class ReportUserFragment : Fragment(), AdapterView.OnItemSelectedListener {
             if (reportString != null) {
                 var other_reason = view.other_explaination.text.toString()
 
-                firebaseDatabaseManager.reportUser(booksViewModel, reportString,
+                firebaseDatabaseManager.reportUser(textbook!!, reportString,
                         if(other_reason.isEmpty()) null else other_reason)
                 firebaseDatabaseManager.removeRequest(booksViewModel, booksViewModel.selected_requested)
 

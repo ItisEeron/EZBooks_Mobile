@@ -42,11 +42,19 @@ class SearchAdapter (fragment : Fragment, searchedQuery : ArrayList<Searched_Tex
                 val b = Bundle()
                 b.putSerializable("textbook", searchedQuery[position])
                 b.putInt("position",position)
-                var newFragment = SearchedTextbookFragment()
-                newFragment.arguments = b
+
+                var TAG = searchedQuery[position].userid + searchedQuery[position].bookid.toString() +
+                        "_detail"
+
+                //Prevents fragment from being recreated multiple times
+                var newFragment = fragment?.activity?.supportFragmentManager?.findFragmentByTag(TAG)
+                if(newFragment == null) {
+                    newFragment = SearchedTextbookFragment()
+                    newFragment.arguments = b
+                }
                 fragment?.fragmentManager?.beginTransaction()?.
                         setCustomAnimations(R.anim.design_snackbar_in, R.anim.design_snackbar_out)?.replace(R.id.flContent,
-                        newFragment, "search_Detail")?.addToBackStack("search_Detail")?.commit()
+                        newFragment, TAG)?.addToBackStack(TAG)?.commit()
             }
         }
     }

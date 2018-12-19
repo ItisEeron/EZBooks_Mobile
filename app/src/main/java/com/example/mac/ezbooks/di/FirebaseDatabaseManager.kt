@@ -153,7 +153,7 @@ class FirebaseDatabaseManager{
 
                 var load = storageRef.child(ACCOUNT_IMG_HEADER+id)
                 load.downloadUrl.addOnSuccessListener {
-                    Picasso.with(navigationView?.context).load(it.toString()).into(navigationView?.getHeaderView(0)?.
+                    Picasso.get().load(it.toString()).into(navigationView?.getHeaderView(0)?.
                             findViewById<ImageView>(R.id.user_header_image))
                 }.addOnFailureListener {
                     Toast.makeText(navigationView?.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
@@ -289,8 +289,8 @@ class FirebaseDatabaseManager{
 
     }
 
-    fun reportUser(viewModel: MainViewModel, report : String, other_reason : String?){
-        val myRef = database.getReference(KEY_ACCOUNT).child(viewModel.selected_requested.userid!!)
+    fun reportUser(textbook: Searched_Textbooks, report : String, other_reason : String?){
+        val myRef = database.getReference(KEY_ACCOUNT).child(textbook.userid!!)
                 .child(KEY_REPORTS).child(report)
         myRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
@@ -329,7 +329,7 @@ class FirebaseDatabaseManager{
         }
 
         load.downloadUrl.addOnSuccessListener {
-            Picasso.with(imageView.context).load(it.toString()).resize(500, 500)
+            Picasso.get().load(it.toString()).resize(200, 200)
             .centerCrop().into(imageView)
         }.addOnFailureListener {
             Toast.makeText(imageView.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
@@ -351,7 +351,7 @@ class FirebaseDatabaseManager{
 
 
         load.downloadUrl.addOnSuccessListener {
-            Picasso.with(imageView.context).load(it.toString()).resize(100, 100)
+            Picasso.get().load(it.toString()).resize(100, 100)
                     .centerCrop().into(imageView)
         }.addOnFailureListener {
             Toast.makeText(imageView.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
