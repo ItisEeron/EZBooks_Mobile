@@ -237,25 +237,27 @@ class UploadBookFragment : Fragment(){
                 Log.d("Eeron ", "Made it!")
                 val textbookdata = books[0] as JsonObject
                 val info = textbookdata["volumeInfo"] as JsonObject
-                val textbookTitle = info["title"] as String
+                val textbookTitle =info["title"] as String
                 val textbookImageLink = info["imageLinks"] as JsonObject
                 val textbookSmallThumb = textbookImageLink.get("smallThumbnail")
                 var textbookThumb = textbookImageLink.get("thumbnail")
 
+                //MAKE SURE THAT ANY EXTRA PARENTHESIS AND SPACES ARE REMOVED!!!
+                var textbookThumbString = textbookThumb.toString().trim('"', ' ')
+
+                //NOTICE FOR GOOGLE IMAGES, MUST REPLACE http WITH https ELSE YOU WILL GET FAILURE
+                textbookThumbString = textbookThumbString.replaceFirst("http:", "https:")
 
                 if(selectedImage == null) {
-                    selectedImage = Uri.parse(textbookThumb.asString.trim('"', ' '))
+                    selectedImage = Uri.parse(textbookThumbString)
 
-                    Picasso.get().load("http://books.google.com/books/content?id=hbDrBAhjDQIC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-                            /*textbookSmallThumb.toString().trim('"', ' ')*/).into(bookImage, object : Callback {
+                    Picasso.get().load(textbookThumbString).into(bookImage, object : Callback {
                         override fun onError(e: Exception) {
                             Log.d("Eeron ", e.toString())
                         }
 
                         override fun onSuccess() {
                             databaseManager.createTextbook(booksViewModel.user_account, newTextbooks, selectedImage)
-
-                            //Navigate back home
                             fragmentManager?.popBackStack()
                             //Task to keep the home page labels intact
                             activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
@@ -270,19 +272,6 @@ class UploadBookFragment : Fragment(){
                 }
             }
 
-            /*
-            databaseManager.createTextbook(booksViewModel.user_account, newTextbooks, selectedImage)
-
-            //Navigate back home
-            fragmentManager?.popBackStack()
-            //Task to keep the home page labels intact
-            activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
-            activity?.title ="EZ Books Home"
-
-            Toast.makeText(activity,
-                    "You have successfully posted a textbook!",
-                    Toast.LENGTH_LONG).show()
-            */
         }
     }
 
