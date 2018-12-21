@@ -1,7 +1,6 @@
 package com.example.mac.ezbooks.detail_fragments
 
 import android.arch.lifecycle.ViewModelProviders
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -17,7 +16,6 @@ import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.RecyclerView_Adapters.UserNamesRecyclerAdapter
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
 import com.example.mac.ezbooks.ui.main.Textbooks
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.detail_selling_books_layout.*
 import kotlinx.android.synthetic.main.detail_selling_books_layout.view.*
 
@@ -55,7 +53,7 @@ class SellingBookDetailFragment : Fragment() {
         view.detail_selling_book_instructor.text = selectedTextbook.instructor
 
         databaseManager.getTextbookImg(selectedTextbook.book_id.toString(), selectedTextbook.affiliated_account?.user_id!!,
-                view.detail_selling_book_image)
+                view.detail_selling_book_image, selectedTextbook.thumbnailURL)
 
         view.edit_listing_button.setOnClickListener{
 
@@ -65,7 +63,7 @@ class SellingBookDetailFragment : Fragment() {
             //Prevents fragment from being recreated multiple times
             var newFragment = activity?.supportFragmentManager?.findFragmentByTag(TAG)
             if(newFragment == null) {
-                newFragment = ReportUserFragment()
+                newFragment = EditListingFragment()
             }
             activity?.supportFragmentManager?.beginTransaction()?.
                     setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,

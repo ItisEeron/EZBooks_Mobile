@@ -1,35 +1,19 @@
 package com.example.mac.ezbooks.di
 
-import android.content.ContentResolver
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.provider.MediaStore
 import android.support.design.widget.NavigationView
-import android.util.Base64
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import com.bumptech.glide.GlideBuilder
-import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.module.AppGlideModule
-import com.bumptech.glide.request.Request
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.ui.main.*
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Callback
+import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.Picasso
+import java.lang.Exception
 
 
 class FirebaseDatabaseManager{
@@ -53,18 +37,14 @@ class FirebaseDatabaseManager{
     private val KEY_BUYER_ID = "buyer_id"
     private val KEY_BUYER_NAME = "buyer_name"
     private val KEY_BUYER_APPROVAL = "buyer_approval"
+    private val KEY_THUMBNAIL = "thumbnail"
+    private val KEY_REPORTED = "reported"
 
     private val TEXTBOOK_IMG_HEADER = "images/textbooks/"
     private val ACCOUNT_IMG_HEADER = "images/accounts/"
 
     private val database = FirebaseDatabase.getInstance()
     private val storage = FirebaseStorage.getInstance()
-
-    @GlideModule class MyAppGlideModule : AppGlideModule(){
-        override fun applyOptions(context: Context, builder: GlideBuilder) {
-            builder.setDefaultRequestOptions(RequestOptions().format(DecodeFormat.PREFER_ARGB_8888))
-        }
-    }
 
     fun createUser(id: String, name: String, email: String) {
         val myRef = database.getReference(KEY_ACCOUNT)
@@ -89,6 +69,8 @@ class FirebaseDatabaseManager{
         //starting upload
         if(selectedImage != null) {
             imageRef.putFile(selectedImage)
+        }else{
+            myRef.child(book_id).child(KEY_THUMBNAIL).setValue(textbook.thumbnailURL)
         }
 
         //Now create the reference for searching purposes
@@ -102,6 +84,7 @@ class FirebaseDatabaseManager{
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_COURSE).setValue(textbook.course)
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_EMAIL).setValue(user_account.email_address)
         myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_PHONE).setValue(user_account.phone_number)
+        myRef.child(user_account.user_id.toString() + textbook.book_id.toString()).child(KEY_THUMBNAIL).setValue(textbook.thumbnailURL)
     }
 
     fun updateAccount(account : UserAccount, selectedImage: Uri?){
@@ -226,6 +209,12 @@ class FirebaseDatabaseManager{
                         }
                     }
                 }
+                KEY_REPORTED ->{
+                    val reported = item.children
+                    for(theReported in reported){
+                        viewModel.reportedBooks.add(theReported.key.toString())
+                    }
+                }
             }//when
         }//for
 
@@ -289,7 +278,7 @@ class FirebaseDatabaseManager{
 
     }
 
-    fun reportUser(textbook: Searched_Textbooks, report : String, other_reason : String?){
+    fun reportUser(textbook: Searched_Textbooks, report : String, other_reason : String?, reporter : UserAccount){
         val myRef = database.getReference(KEY_ACCOUNT).child(textbook.userid!!)
                 .child(KEY_REPORTS).child(report)
         myRef.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -308,6 +297,10 @@ class FirebaseDatabaseManager{
                     myRef.parent!!.child(KEY_OTHERS_LOG).child(report_count.toString())
                             .setValue(other_reason)
                 }
+
+                val myReported = database.getReference(KEY_ACCOUNT).child(reporter.user_id!!).child(KEY_REPORTED)
+                myReported.child(textbook.userid!! + textbook.bookid.toString()).setValue(1)
+
             }
         })
     }
@@ -316,13 +309,8 @@ class FirebaseDatabaseManager{
         var storageRef = storage.getReference()
 
         var load = storageRef.child(ACCOUNT_IMG_HEADER+account_id)
-        val requestOptions = RequestOptions()
-        requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
 
         Log.d("Eeron Tag:" ,load.getBytes(Long.MAX_VALUE).toString())
-        //Glide.with(imageView.context).load(load.downloadUrl).apply(requestOptions.skipMemoryCache(false))
-          //      .into(imageView)
-            //    .onLoadFailed(imageView.context.resources.getDrawable(R.drawable.blank_profile_picture_973460_640))
 
         load.metadata.addOnSuccessListener {
             Log.d("Eeron Tag:" , it.sizeBytes.toString())
@@ -338,12 +326,10 @@ class FirebaseDatabaseManager{
 
     }
 
-    fun getTextbookImg(textbook_id: String, account_id: String, imageView: ImageView){
+    fun getTextbookImg(textbook_id: String, account_id: String, imageView: ImageView, thumbNailURL: String? = null){
         var storageRef = storage.getReference()
 
         var load = storageRef.child(TEXTBOOK_IMG_HEADER+account_id+textbook_id)
-        val requestOptions = RequestOptions()
-        requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(false)
 
         load.metadata.addOnSuccessListener {
             Log.d("Eeron Tag:" , it.sizeBytes.toString())
@@ -351,12 +337,17 @@ class FirebaseDatabaseManager{
 
 
         load.downloadUrl.addOnSuccessListener {
-            Picasso.get().load(it.toString()).resize(100, 100)
+            Picasso.get().load(it.toString()).resize(200, 200)
                     .centerCrop().into(imageView)
         }.addOnFailureListener {
-            Toast.makeText(imageView.context, "There was an error loading the users image", Toast.LENGTH_SHORT)
-            imageView.setImageResource(R.drawable.android_image_5)
+            Picasso.get().load(thumbNailURL).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView, object : Callback {
+                override fun onError(e: Exception?) {
+                    imageView.setImageResource(R.drawable.android_image_5)
+                }
 
+                override fun onSuccess() {
+                }
+            })
         }
 
     }

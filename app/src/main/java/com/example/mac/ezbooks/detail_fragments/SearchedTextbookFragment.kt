@@ -1,7 +1,6 @@
 package com.example.mac.ezbooks.detail_fragments
 
 import android.arch.lifecycle.ViewModelProviders
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -39,7 +38,7 @@ class SearchedTextbookFragment : Fragment() {
         view.detail_requested_book_seller.text = textbook.user_name
 
         databaseManager.getTextbookImg(textbook.bookid.toString(), textbook.userid!!,
-                view.detail_requested_book_image)
+                view.detail_requested_book_image, textbook.thumbnailURL)
 
         //First check to see if the selected list of buyers is null (it should not!!)
         var isAproved = false

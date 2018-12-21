@@ -60,7 +60,7 @@
     <string name="last_name">Last Name</string>
     <string name="email">email</string>
     <string name="create_account">Create Account</string>
-    <string name="send_password_reset_email">Send email to rest password</string>
+    <string name="send_password_reset_email">Send email to reset password</string>
     <string name="your_profile">Your Profile:</string>
 
 

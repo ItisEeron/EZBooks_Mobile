@@ -1,6 +1,5 @@
 package com.example.mac.ezbooks
 
-
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -14,11 +13,9 @@ import android.text.Editable
 import android.text.TextWatcher
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Potential_Buyer
 import com.example.mac.ezbooks.ui.main.Searched_Textbooks
@@ -34,13 +31,14 @@ class SearchFragment :  Fragment() {
     private val KEY_ISBN = "isbn"
     private val KEY_INSTRUCTOR = "instructor"
     private val KEY_COURSE = "course"
-    private val KEY_BOOK_IMG = "book_img"
     private val KEY_POTENTIAL_BUYERS = "potential_buyers"
     private val KEY_BUYER_ID = "buyer_id"
     private val KEY_BUYER_NAME = "buyer_name"
     private val KEY_BUYER_APPROVAL = "buyer_approval"
     private val KEY_PHONE = "phone_number"
     private val KEY_EMAIL = "email"
+    private val KEY_THUMBNAIL = "thumbnail"
+
 
 
     var search_edit_text: EditText? = null
@@ -49,20 +47,22 @@ class SearchFragment :  Fragment() {
     var firebaseUser: FirebaseUser? = null
     var searchedQuery : ArrayList<Searched_Textbooks>? = null
     lateinit var booksViewModel : MainViewModel
+    lateinit var reportedUsers : ArrayList<String>
 
     var searchAdapter: SearchAdapter? = null
 
     override fun onCreate(savedInstanceState : Bundle?) {
         //Super allows the original function to execute then you add your own code
         super.onCreate(savedInstanceState)
-        //Changes Title
 
-        //activity?.title = "Search for a Book"
         //Creates the viewModel neccessary for maintaining the data.
         booksViewModel = activity?.run {
             ViewModelProviders.of(this).get(MainViewModel::class.java) }
                 ?: throw Exception("Invalid Activity")
 
+        databaseReference = FirebaseDatabase.getInstance().reference
+        firebaseUser = FirebaseAuth.getInstance().currentUser
+        reportedUsers = booksViewModel.reportedBooks
 
     }
 
@@ -73,8 +73,6 @@ class SearchFragment :  Fragment() {
         search_edit_text = view.findViewById(R.id.search_edit_text)
         recyclerView = view.findViewById(R.id.recyclerView)
 
-        databaseReference = FirebaseDatabase.getInstance().reference
-        firebaseUser = FirebaseAuth.getInstance().currentUser
 
         recyclerView?.setHasFixedSize(true)
         recyclerView?.setLayoutManager(LinearLayoutManager(this.context))
@@ -111,10 +109,11 @@ class SearchFragment :  Fragment() {
         return view
     }
 
+
     private fun setAdapter(searchString : String ){
         databaseReference?.child(KEY_TEXTBOOK_REF)?.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -139,13 +138,12 @@ class SearchFragment :  Fragment() {
                     val isbn = textbook.child(KEY_ISBN).getValue(String::class.java)
                     val course = textbook.child(KEY_COURSE).getValue(String::class.java)
                     val instructor = textbook.child(KEY_INSTRUCTOR).getValue(String::class.java)
-                    val book_img_string = textbook.child(KEY_BOOK_IMG).getValue(String::class.java)
-                    var book_img : ByteArray? = null
-
-                    if(book_img_string != null)
-                        book_img =  Base64.decode(book_img_string, Base64.DEFAULT)
+                    val thumbnail =  textbook.child(KEY_THUMBNAIL).value.toString()
 
                     if(userid == booksViewModel.user_account.user_id)
+                        exit = true
+
+                    if(reportedUsers.contains(userid + bookid.toString()))
                         exit = true
 
                     val potential_Buyer : MutableList<Potential_Buyer> = mutableListOf()
@@ -154,7 +152,7 @@ class SearchFragment :  Fragment() {
                     for (buyer in buyers_iter) {
                         var buyerName : String?
                         var buyerID : String?
-                        var buyerApproval : Boolean = false
+                        var buyerApproval = false
 
                         buyerID = buyer.child(KEY_BUYER_ID).value.toString()
                         buyerName =  buyer.child(KEY_BUYER_NAME).value as String
@@ -162,18 +160,16 @@ class SearchFragment :  Fragment() {
 
                         if(buyerID == booksViewModel.user_account.user_id)
                             exit = true
-
                         potential_Buyer.add(Potential_Buyer(buyerID!!, buyerName!!, buyerApproval!!))
                     }
 
-                    //TODO: MAKE IT SO ALREADY REQUESTED ITEMS DONT QUEREY ALSO FOR ITEMS BELONGING TO OWNER
                     if(title!!.toLowerCase().contains(searchString.toLowerCase()) ||
                             isbn!!.toLowerCase().contains(searchString.toLowerCase()) ||
                             course!!.toLowerCase().contains(searchString.toLowerCase())||
                             instructor!!.toLowerCase().contains(searchString.toLowerCase())) {
                         if(exit == false) {
                             searchedQuery?.add(Searched_Textbooks(userid, bookid, user_name, user_email, user_phone, title, isbn,
-                                    course, instructor, potential_Buyer))
+                                    course, instructor, potential_Buyer, thumbnail))
                             counter++
                         }
 

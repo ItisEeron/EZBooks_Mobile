@@ -1,7 +1,6 @@
 package com.example.mac.ezbooks.ui.main.RecyclerView_Adapters
 
 
-import android.graphics.BitmapFactory
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -71,7 +70,7 @@ class SearchAdapter (fragment : Fragment, searchedQuery : ArrayList<Searched_Tex
         viewHolder.itemImage.setImageResource(R.drawable.android_image_5)
 
         databaseManager.getTextbookImg(searchedQuery[i].bookid.toString(),searchedQuery[i].userid!!,
-                viewHolder.itemImage)
+                viewHolder.itemImage, searchedQuery[i].thumbnailURL)
 
     }
 

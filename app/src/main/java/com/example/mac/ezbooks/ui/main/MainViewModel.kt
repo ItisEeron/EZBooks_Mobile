@@ -2,7 +2,6 @@ package com.example.mac.ezbooks.ui.main
 
 import android.arch.lifecycle.ViewModel
 import android.support.design.widget.NavigationView
-import android.support.v4.app.Fragment
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import java.io.Serializable
 
@@ -15,9 +14,8 @@ class MainViewModel : ViewModel() {
     lateinit var selected_requested: Searched_Textbooks
     lateinit var recent_requested_Textbooks: MutableList<Searched_Textbooks>
     lateinit var recent_selling_Textbooks: MutableList<Textbooks>
-    private val databaseManager = FirebaseDatabaseManager()
-    var detailFragTable = HashMap<String, Fragment>()
-
+    val databaseManager = FirebaseDatabaseManager()
+    var reportedBooks : ArrayList<String> = arrayListOf()
 
 
     fun getAllTextbooks(user_id : String, user_name: String?, user_email: String?, navigationView: NavigationView?) {
@@ -49,11 +47,11 @@ class MainViewModel : ViewModel() {
 
 //TODO:CHECK WITH OTHER EZ-BOOKS MEMBERS TO MAKE SURE INFORMATION IS VALID!!
 data class Textbooks( val book_id: Long, var Title:String, var isbn:String, var instructor:String?, var course:String?,
-                     var affiliated_account:UserAccount?, var potential_buyers: MutableList<Potential_Buyer>?)
+                     var affiliated_account:UserAccount?, var potential_buyers: MutableList<Potential_Buyer>?, var thumbnailURL : String? = null)
 data class UserAccount(var user_id: String?, var user_name:String?, var email_address:String?,
                     var phone_number:String?, val date_joined:String?, var account_status:Int,
                     var class_standing:String?)
-data class Potential_Buyer(val account_id:String, var account_name:String, var approved:Boolean)
+data class Potential_Buyer(val account_id:String, var account_name:String, var approved:Boolean): Serializable
 
 data class Searched_Textbooks(val userid : String?,
                               val bookid : Long?,
@@ -64,4 +62,4 @@ data class Searched_Textbooks(val userid : String?,
                               val isbn : String?,
                               val course : String?,
                               val instructor : String?,
-                              var potential_buyers: MutableList<Potential_Buyer>?) : Serializable
+                              var potential_buyers: MutableList<Potential_Buyer>?, var thumbnailURL: String? = null) : Serializable

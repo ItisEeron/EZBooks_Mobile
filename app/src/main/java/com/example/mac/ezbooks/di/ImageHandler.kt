@@ -1,7 +1,6 @@
 package com.example.mac.ezbooks.di
 
 import android.app.Activity
-import android.app.Instrumentation
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,6 +12,9 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.FileProvider
 import android.widget.ImageView
+import com.example.mac.ezbooks.detail_fragments.EditListingFragment
+import com.example.mac.ezbooks.ui.main.EditAccountFragment
+import com.example.mac.ezbooks.ui.main.UploadBookFragment
 import java.text.SimpleDateFormat
 import java.util.*
 import java.io.*
@@ -42,6 +44,17 @@ class ImageHandler {
                     )
 
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    when(fragment.tag){
+                        "uploadBook"->{
+                            (fragment as UploadBookFragment).selectedImage = photoURI
+                        }
+                        "editAccount"->{
+                            (fragment as EditAccountFragment).selectedImage = photoURI
+                        }
+                        else->{
+                            (fragment as EditListingFragment).selectedImage = photoURI
+                        }
+                    }
 
                     startActivityForResult(activity, takePictureIntent, REQUEST_TAKE_PHOTO, null)
 

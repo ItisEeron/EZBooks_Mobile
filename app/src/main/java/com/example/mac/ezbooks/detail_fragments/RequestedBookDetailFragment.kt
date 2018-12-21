@@ -1,7 +1,6 @@
 package com.example.mac.ezbooks.detail_fragments
 
 import android.arch.lifecycle.ViewModelProviders
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -19,9 +18,7 @@ import kotlinx.android.synthetic.main.detail_requested_books_layout.view.*
 class RequestedBookDetailFragment : Fragment() {
     lateinit var image: ImageView
     private lateinit var booksViewModel: MainViewModel
-    private lateinit var textbook: Searched_Textbooks
     private var RECENTS_SIZE = 5
-    private var MIN_SIZE = 0
     val databaseManager : FirebaseDatabaseManager = FirebaseDatabaseManager()
     lateinit var selectedTextbook : Searched_Textbooks
 
@@ -42,7 +39,6 @@ class RequestedBookDetailFragment : Fragment() {
         } ?: throw Exception("Invalid Activity")
 
         selectedTextbook = booksViewModel.selected_requested
-
         //Set up information
         view.detail_requested_book_title.text = selectedTextbook.title
         view.detail_requested_book_isbn.text = selectedTextbook.isbn
@@ -50,7 +46,7 @@ class RequestedBookDetailFragment : Fragment() {
         view.detail_requested_book_instructor.text = selectedTextbook.instructor
 
         databaseManager.getTextbookImg(selectedTextbook.bookid.toString(), selectedTextbook.userid!!,
-                view.detail_requested_book_image)
+                view.detail_requested_book_image, selectedTextbook.thumbnailURL)
 
         view.detail_requested_book_seller.text = selectedTextbook.user_name
 
@@ -109,8 +105,10 @@ class RequestedBookDetailFragment : Fragment() {
 
         view.edit_button.setOnClickListener{
 
+            val b = Bundle()
+            b.putSerializable("textbook", selectedTextbook)
 
-            var TAG = textbook.userid + textbook.bookid.toString() +
+            var TAG = selectedTextbook.userid + selectedTextbook.bookid.toString() +
                     "_report"
 
             //Prevents fragment from being recreated multiple times
@@ -118,6 +116,7 @@ class RequestedBookDetailFragment : Fragment() {
             if(newFragment == null) {
                 newFragment = ReportUserFragment()
             }
+            newFragment.arguments = b
             activity?.supportFragmentManager?.beginTransaction()?.
                     setCustomAnimations(R.anim.design_snackbar_in,R.anim.design_snackbar_out)?.replace(R.id.flContent,
                     newFragment, TAG)?.addToBackStack(TAG)?.commit()

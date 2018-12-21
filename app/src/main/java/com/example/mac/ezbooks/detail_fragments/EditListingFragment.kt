@@ -4,11 +4,9 @@ import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Bundle
-import android.provider.MediaStore
-import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,11 +19,16 @@ import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.di.ImageHandler
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.example.mac.ezbooks.ui.main.Textbooks
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.upload_book_layout.*
 import kotlinx.android.synthetic.main.upload_book_layout.view.*
-import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class EditListingFragment : Fragment() {
@@ -34,12 +37,14 @@ class EditListingFragment : Fragment() {
     private var pendingUpload: ByteArray? = null
     private var imageHandler : ImageHandler = ImageHandler()
     private val databaseManager = FirebaseDatabaseManager()
-    private var selectedImage : Uri? = null
+    var selectedImage : Uri? = null
     val GET_FROM_GALLERY = 3
-    val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var bookImage : ImageView
     private lateinit var selectedTextbook : Textbooks
-
+    val CONNECTON_TIMEOUT_MILLISECONDS = 600000
+    var url_base = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
+    var searchBookURL: String = ""
+    var popStack = true
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.upload_book_layout, container, false)
 
@@ -47,36 +52,47 @@ class EditListingFragment : Fragment() {
         view.post_book_label.text = "Edit a Book:"
         view.submit_book_button.text = "Submit Edits"
 
+        if(selectedImage != null){
+            Picasso.get().load(selectedImage).into(bookImage)
+        }
 
         view.submit_book_button.setOnClickListener {
+            searchBookURL = ""
+            popStack = true
 
-            //TODO: COPY METHOD BREAKS
-            if(!book_title_editText.text.isBlank()) {
-                selectedTextbook.Title = book_title_editText.text.toString()
-            }//if
-            if(!book_isbn_editText.text.isBlank()){
-                selectedTextbook.isbn = book_isbn_editText.text.toString()
-            }//if
-            if(!book_course_editText.text.isBlank()){
-                selectedTextbook.course = book_course_editText.text.toString()
-            }//if
-            if(!book_instructor_editText.text.isBlank()){
-                selectedTextbook.instructor = book_instructor_editText.text.toString()
-            }//if
+            if((!book_isbn_editText.text.isBlank())){
+                popStack = false
+                searchBookURL = url_base + book_isbn_editText.text.toString()
+                if(!book_title_editText.text.isBlank()) {
+                    selectedTextbook.Title = book_title_editText.text.toString()
+                }//if
+                if(!book_course_editText.text.isBlank()){
+                    selectedTextbook.course = book_course_editText.text.toString()
+                }//if
+                if(!book_instructor_editText.text.isBlank()){
+                    selectedTextbook.instructor = book_instructor_editText.text.toString()
+                }//if
+                GetBooksAsyncTask().execute(searchBookURL)
 
-            databaseManager.getTextbookImg(selectedTextbook.book_id.toString(), selectedTextbook.affiliated_account?.user_id!!,
-                    bookImage)
+            }//if
+            else{
+                popStack = true
+                if(!book_title_editText.text.isBlank()) {
+                    selectedTextbook.Title = book_title_editText.text.toString()
+                }//if
+                if(!book_course_editText.text.isBlank()){
+                    selectedTextbook.course = book_course_editText.text.toString()
+                }//if
+                if(!book_instructor_editText.text.isBlank()){
+                    selectedTextbook.instructor = book_instructor_editText.text.toString()
+                }//if
+                databaseManager.createTextbook(booksViewModel.user_account, selectedTextbook, selectedImage)
+            }
 
-            databaseManager.createTextbook(booksViewModel.user_account,selectedTextbook,
-                    selectedImage)
 
             //Navigate back home
-            fragmentManager?.popBackStack()
-            //Task to keep the home page labels intact
-
-            Toast.makeText(activity, "You have edited your textbook!",
-                    Toast.LENGTH_LONG).show()
-
+            if(popStack == true)
+                fragmentManager?.popBackStack()
 
         }//view.submit_book_button.setOnClickListener
 
@@ -137,34 +153,103 @@ class EditListingFragment : Fragment() {
         if(resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 GET_FROM_GALLERY -> {
-
                     try {
                         selectedImage = data?.getData()
-                        Picasso.get().load(selectedImage).into(bookImage)
-                        /*var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
-                                ?.getContentResolver(), selectedImage)
-                        user_image.setImageBitmap(bitmap)
-                        var stream = ByteArrayOutputStream()
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                        pendingUpload = stream.toByteArray()
-                        */
-
                     } catch (e: IOException) {
                         Log.i("TAG", "Some exception " + e)
                     }
                 }
-                REQUEST_IMAGE_CAPTURE ->{
-                    selectedImage = data?.extras?.get("data") as? Uri
-                    Picasso.get().load(selectedImage).into(bookImage)
-
-                    /*val imageBitmap = data?.extras?.get("data") as? Bitmap
-
-                    pendingUpload = imageHandler.setPic(user_image, mCurrentPhotoPath)
-                    imageHandler.galleryAddPic(this.activity!! , mCurrentPhotoPath)
-                    */
-                }
 
             }
+        }
+    }
+
+    inner class GetBooksAsyncTask : AsyncTask<String, String, String>() {
+        override fun doInBackground(vararg params: String?): String {
+            var urlConnection: HttpURLConnection? = null
+            var inString = ""
+            try {
+                val url = URL(searchBookURL)
+
+                urlConnection = url.openConnection() as HttpURLConnection
+                urlConnection.connectTimeout = CONNECTON_TIMEOUT_MILLISECONDS
+                urlConnection.readTimeout = CONNECTON_TIMEOUT_MILLISECONDS
+
+                //var inString = streamToString(urlConnection.inputStream)
+
+                // replaces need for streamToString()
+                inString = urlConnection.inputStream.bufferedReader().readText()
+
+                publishProgress(inString)
+            } catch (ex: Exception) {
+                Log.d("Eeron" ,"HttpURLConnection exception" + ex)
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect()
+                }
+            }
+
+            return inString
+        }
+
+        override fun onPostExecute(result: String) {
+            var bookData = Gson().fromJson(result, JsonObject::class.java)
+            val totalItems = bookData["totalItems"].asInt
+            if(totalItems == 0){
+                Log.d("Eeron ", "This book was not found in the Database")
+                Toast.makeText(activity,
+                        "We could not find this textbook",
+                        Toast.LENGTH_LONG).show()
+            } else {
+                //var bookData = Gson().fromJson(result, JsonObject::class.java)
+                var books = bookData["items"] as JsonArray
+                Log.d("Eeron: " , "I Parsed it! Made it!!!")
+                //Show that the data has been successfully parsed
+                Log.d("Eeron ", "Made it!")
+                val textbookdata = books[0] as JsonObject
+                val info = textbookdata["volumeInfo"] as JsonObject
+                var textbookTitle =info["title"]
+                selectedTextbook.Title = textbookTitle.asString
+                val textbookImageLink = info["imageLinks"] as JsonObject
+                var textbookThumb = textbookImageLink.get("thumbnail")
+
+                //MAKE SURE THAT ANY EXTRA PARENTHESIS AND SPACES ARE REMOVED!!!
+                var textbookThumbString = textbookThumb.toString().trim('"', ' ')
+
+                //NOTICE FOR GOOGLE IMAGES, MUST REPLACE http WITH https ELSE YOU WILL GET FAILURE
+                textbookThumbString = textbookThumbString.replaceFirst("http:", "https:")
+
+                if(selectedImage == null) {
+                    Picasso.get().load(textbookThumbString).into(bookImage, object : Callback {
+                        override fun onError(e: Exception) {
+                            Log.d("Eeron ", e.toString())
+                        }
+
+                        override fun onSuccess() {
+                            selectedTextbook.thumbnailURL = textbookThumbString
+                            selectedTextbook.isbn = book_isbn_editText.text.toString()
+                            databaseManager.createTextbook(booksViewModel.user_account, selectedTextbook, selectedImage)
+                            fragmentManager?.popBackStack()
+                            //Task to keep the home page labels intact
+
+                            Toast.makeText(activity,
+                                    "You have successfully edited the textbook!",
+                                    Toast.LENGTH_LONG).show()
+                        }
+                    })
+                }else{
+                    selectedTextbook.thumbnailURL = textbookThumbString
+                    selectedTextbook.isbn = book_isbn_editText.text.toString()
+                    databaseManager.createTextbook(booksViewModel.user_account, selectedTextbook, selectedImage)
+                    fragmentManager?.popBackStack()
+                    //Task to keep the home page labels intact
+
+                    Toast.makeText(activity,
+                            "You have successfully edited the textbook!",
+                            Toast.LENGTH_LONG).show()
+                }
+            }
+
         }
     }
 

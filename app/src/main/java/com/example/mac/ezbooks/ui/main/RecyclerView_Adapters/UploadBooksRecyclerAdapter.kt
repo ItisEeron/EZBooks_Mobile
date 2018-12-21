@@ -1,26 +1,20 @@
 package com.example.mac.ezbooks.ui.main.RecyclerView_Adapters
 
-import android.content.res.Resources
-import android.graphics.BitmapFactory
-import android.graphics.Color
+
 import android.support.v4.app.Fragment
-import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import com.bumptech.glide.Glide
 import com.example.mac.ezbooks.HomeFragment
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.detail_fragments.SellingBookDetailFragment
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
-import cz.msebera.android.httpclient.client.cache.Resource
+
 
 //Passes in Fragment in order to determine which List to use
 //If the Fragment is the HomeFragment, we only want the views to populate the with at most
@@ -29,8 +23,6 @@ import cz.msebera.android.httpclient.client.cache.Resource
 //Search will have filtering options and will actually only display the first 40 books
 class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel : MainViewModel): RecyclerView.Adapter<UploadBooksRecyclerAdapter.ViewHolder>() {
     private val storage = FirebaseStorage.getInstance()
-    var storageRef = storage.getReference()
-    private val TEXTBOOK_IMG_HEADER = "images/textbooks/"
     var databaseManager = FirebaseDatabaseManager()
 
     inner class ViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -67,7 +59,6 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ViewHolder {
-        //TODO: add uploaded_book_card_layout and replace request_book_card_layout with this
         val v = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.requested_book_card_layout, viewGroup, false)
 
@@ -84,7 +75,7 @@ class UploadBooksRecyclerAdapter (val fragment: Fragment, private val viewModel 
         viewHolder.itemAccount.text = textbook.affiliated_account?.user_name
 
         databaseManager.getTextbookImg(textbook.book_id.toString(),
-                textbook.affiliated_account?.user_id!!, viewHolder.itemImage)
+                textbook.affiliated_account?.user_id!!, viewHolder.itemImage, textbook.thumbnailURL)
 
     }
 

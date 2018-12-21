@@ -41,7 +41,6 @@ class CreateAccountActivity : AppCompatActivity() {
 
     }
 
-
     private fun initialise() {
         etFirstName = findViewById(R.id.et_first_name) as EditText
         etLastName = findViewById(R.id.et_last_name) as EditText

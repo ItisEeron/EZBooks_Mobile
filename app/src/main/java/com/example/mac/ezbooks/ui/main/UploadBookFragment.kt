@@ -1,18 +1,12 @@
 package com.example.mac.ezbooks.ui.main
 
 import android.app.Activity
-import android.app.DownloadManager
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
-import android.preference.PreferenceManager
-import android.provider.MediaStore
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -21,22 +15,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.example.mac.ezbooks.R
 import com.example.mac.ezbooks.di.*
-import com.google.api.client.json.Json
-import com.google.api.services.books.Books
-import com.google.api.services.books.model.Volume
-import com.google.api.services.books.model.Volumes
-import com.google.common.reflect.TypeToken
 import kotlinx.android.synthetic.main.upload_book_layout.*
 import kotlinx.android.synthetic.main.upload_book_layout.view.*
-import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import com.google.gson.Gson
@@ -44,21 +27,19 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import javax.sql.DataSource
 
 
 class UploadBookFragment : Fragment(){
     private lateinit var booksViewModel : MainViewModel
     private var mCurrentPhotoPath: String = ""
     private lateinit var newTextbooks : Textbooks
-    private var pendingUpload: ByteArray? = null
     private var imageHandler : ImageHandler = ImageHandler()
     private var databaseManager: FirebaseDatabaseManager = FirebaseDatabaseManager()
     val GET_FROM_GALLERY = 3
-    val REQUEST_IMAGE_CAPTURE = 1
     val RECENT_LIST_SIZE = 5
     val CONNECTON_TIMEOUT_MILLISECONDS = 600000
     var url_base = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
+    var searchBookURL: String = ""
     var selectedImage : Uri? = null
     private lateinit var bookImage : ImageView
 
@@ -70,9 +51,14 @@ class UploadBookFragment : Fragment(){
 
         bookImage = view.user_image
 
+        if(selectedImage != null){
+            Picasso.get().load(selectedImage).into(bookImage)
+        }
+
         view.submit_book_button.setOnClickListener {
             //Ensures that the id of each new textbook will never collide!!!!
             var id_generated = 1L
+            searchBookURL = ""
             if(booksViewModel.selling_textbooks.isNotEmpty()) {
                 id_generated = booksViewModel.selling_textbooks.first().book_id + 1
             }
@@ -91,23 +77,9 @@ class UploadBookFragment : Fragment(){
                     booksViewModel.recent_selling_Textbooks.removeAt(RECENT_LIST_SIZE)
 
 
-                //Navigate back home
-                /*
-                fragmentManager?.popBackStack()
-                //Task to keep the home page labels intact
-                activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
-                activity?.title ="EZ Books Home"
-                */
-                url_base = url_base + "9781617293290"
-                GetBooksAsyncTask().execute(url_base)
+                searchBookURL = url_base + book_isbn_editText.text.toString()
+                GetBooksAsyncTask().execute(searchBookURL)
 
-                /*
-                databaseManager.createTextbook(booksViewModel.user_account, newTextbooks, selectedImage)
-
-                Toast.makeText(activity,
-                        "You have successfully posted a textbook!",
-                        Toast.LENGTH_LONG).show()
-                */
             }//if
             else {
                Toast.makeText(activity,
@@ -155,43 +127,13 @@ class UploadBookFragment : Fragment(){
         if(resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 GET_FROM_GALLERY -> {
-
                     try {
                         selectedImage = data?.getData()
-                        Glide.with(this.context!!).load(selectedImage).into( bookImage )
-                        /*
-                        var bitmap = MediaStore.Images.Media.getBitmap(getActivity()
-                                ?.getContentResolver(), selectedImage)
-                        user_image.setImageBitmap(bitmap)
-                        var stream = ByteArrayOutputStream()
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream)
-                        pendingUpload = stream.toByteArray()
-                        */
 
                     } catch (e: IOException) {
                         Log.i("TAG", "Some exception " + e)
                     }
                 }
-                REQUEST_IMAGE_CAPTURE ->{
-                    try {
-                        selectedImage = data?.extras?.get("data") as Uri
-                        Glide.with(this.context!!).load(selectedImage).into(bookImage)
-                        /*
-                        val imageBitmap = data?.extras?.get("data") as? Bitmap
-                        user_image.setImageBitmap(imageBitmap)
-                        var stream = ByteArrayOutputStream()
-                        imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 20, stream)
-                        //imageHandler.setPic(user_image, mCurrentPhotoPath)
-                        //imageHandler.galleryAddPic(this.activity!!, mCurrentPhotoPath )
-                        pendingUpload = stream.toByteArray()
-                        */
-                    }
-                    catch(e : IOException){
-                        Log.i("TAG", "Some exception " + e)
-
-                    }
-                }
-
             }
         }
     }
@@ -202,7 +144,7 @@ class UploadBookFragment : Fragment(){
             var urlConnection: HttpURLConnection? = null
             var inString = ""
             try {
-                val url = URL(url_base)
+                val url = URL(searchBookURL)
 
                 urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.connectTimeout = CONNECTON_TIMEOUT_MILLISECONDS
@@ -226,20 +168,24 @@ class UploadBookFragment : Fragment(){
         }
 
         override fun onPostExecute(result: String) {
-            //var bookData = Gson().fromJson(result, Books::class.java)
             var bookData = Gson().fromJson(result, JsonObject::class.java)
-            var books = bookData["items"] as JsonArray
-            Log.d("Eeron: " , "I Parsed it! Made it!!!")
-            if(bookData == null){
-                Log.d("Eeron ", "Something went wrong with the parse")
-            }
-            else {//Show that the data has been successfully parsed
+            val totalItems = bookData["totalItems"].asInt
+            if(totalItems == 0){
+                Log.d("Eeron ", "This book was not found in the Database")
+                Toast.makeText(activity,
+                        "We could not find this textbook",
+                        Toast.LENGTH_LONG).show()
+            } else {
+                //var bookData = Gson().fromJson(result, JsonObject::class.java)
+                var books = bookData["items"] as JsonArray
+                Log.d("Eeron: " , "I Parsed it! Made it!!!")
+                //Show that the data has been successfully parsed
                 Log.d("Eeron ", "Made it!")
                 val textbookdata = books[0] as JsonObject
                 val info = textbookdata["volumeInfo"] as JsonObject
-                val textbookTitle =info["title"] as String
+                var textbookTitle =info["title"]
+                newTextbooks.Title = textbookTitle.asString
                 val textbookImageLink = info["imageLinks"] as JsonObject
-                val textbookSmallThumb = textbookImageLink.get("smallThumbnail")
                 var textbookThumb = textbookImageLink.get("thumbnail")
 
                 //MAKE SURE THAT ANY EXTRA PARENTHESIS AND SPACES ARE REMOVED!!!
@@ -249,14 +195,13 @@ class UploadBookFragment : Fragment(){
                 textbookThumbString = textbookThumbString.replaceFirst("http:", "https:")
 
                 if(selectedImage == null) {
-                    selectedImage = Uri.parse(textbookThumbString)
-
                     Picasso.get().load(textbookThumbString).into(bookImage, object : Callback {
                         override fun onError(e: Exception) {
                             Log.d("Eeron ", e.toString())
                         }
 
                         override fun onSuccess() {
+                            newTextbooks.thumbnailURL = textbookThumbString
                             databaseManager.createTextbook(booksViewModel.user_account, newTextbooks, selectedImage)
                             fragmentManager?.popBackStack()
                             //Task to keep the home page labels intact
@@ -269,6 +214,17 @@ class UploadBookFragment : Fragment(){
                         }
                     })
                     //selectedImage = Uri.parse(textbookThumb.asString)
+                }else{
+                    newTextbooks.thumbnailURL = textbookThumbString
+                    databaseManager.createTextbook(booksViewModel.user_account, newTextbooks, selectedImage)
+                    fragmentManager?.popBackStack()
+                    //Task to keep the home page labels intact
+                    activity?.findViewById<NavigationView>(R.id.nav_view)?.setCheckedItem(R.id.nav_home)
+                    activity?.title ="EZ Books Home"
+
+                    Toast.makeText(activity,
+                            "You have successfully posted a textbook!",
+                            Toast.LENGTH_LONG).show()
                 }
             }
 

@@ -14,10 +14,6 @@ import com.example.mac.ezbooks.detail_fragments.RequestedBookDetailFragment
 import com.example.mac.ezbooks.di.FirebaseDatabaseManager
 import com.example.mac.ezbooks.ui.main.MainViewModel
 
-
-
-
-
 //Passes in Fragment in order to determine which List to use
 //If the Fragment is the HomeFragment, we only want the views to populate the with at most
 //5 Books
@@ -79,7 +75,8 @@ class R_B_RecyclerAdapter (val fragment: Fragment , private val viewModel : Main
         viewHolder.itemISBN.text = textbook.isbn
         viewHolder.itemAccount.text = textbook.user_name
 
-        databaseManager.getTextbookImg(textbook.bookid.toString(), textbook.userid!!, viewHolder.itemImage)
+        databaseManager.getTextbookImg(textbook.bookid.toString(), textbook.userid!!,
+                viewHolder.itemImage, textbook.thumbnailURL)
 
     }
 
